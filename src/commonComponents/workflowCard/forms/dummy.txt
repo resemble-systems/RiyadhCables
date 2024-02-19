@@ -1,0 +1,788 @@
+<Modal
+  title={`${title} Form`}
+  footer={false}
+  centered={false}
+  open={modalOpen}
+  onOk={handleClose}
+  onCancel={handleClose}
+  style={{ top: 10 }}
+  width={"100vw"}
+>
+  <div className="bg-white">
+    <div className="container" style={{ height: "90vh", overflowY: "scroll" }}>
+      <div className="text-center">
+        {headerLogo?.map(
+          (header: {
+            AttachmentFiles: { ServerRelativeUrl: string }[];
+            Height: any;
+            Width: any;
+          }) => (
+            <img
+              src={
+                context.pageContext.web.absoluteUrl
+                  .split("/")
+                  .slice(0, 3)
+                  .join("/") + header?.AttachmentFiles[0]?.ServerRelativeUrl
+              }
+              height={`${header.Height}`}
+              width={`${header.Width}`}
+              className=""
+            />
+          )
+        )}
+      </div>
+      <div className="text-center">IT Department</div>
+      <h4 className="text-center">New User Creation Request</h4>
+      <form
+        className="border border-3 border-dark mb-5"
+        id="userForm"
+        onSubmit={handleSubmit}
+      >
+        <div
+          className="text-center bg-light borderBottom py-2"
+          style={{ fontSize: "1.25em", fontWeight: "600" }}
+        >
+          Employee Information
+        </div>
+        <div className="gridTemplate borderBottom">
+          <div className="innerGridTemplate lgRight">
+            <div className="d-flex justify-content-between px-2 borderRight align-items-center py-2">
+              <label className="" htmlFor="department">
+                Department
+              </label>
+              <span>:</span>
+            </div>
+            <input
+              type="text"
+              required
+              className="px-2"
+              id="department"
+              name="department"
+              value={department}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="mobileGrid lgBorderRight">
+            <div className="d-flex borderRight justify-content-between px-2 align-items-center py-2">
+              <label className="" htmlFor="date">
+                Date
+              </label>
+              <span>:</span>
+            </div>
+            <input
+              type="date"
+              required
+              className="px-2"
+              name="date"
+              value={date}
+              id="date"
+              onChange={handleChange}
+            />
+          </div>
+        </div>
+        <div className="innerGridTemplate borderBottom">
+          <div className="d-flex justify-content-between px-2 borderRight py-2">
+            <label className="" htmlFor="email">
+              Email Display Name
+            </label>
+            <span>:</span>
+          </div>
+          <div className="d-flex justify-content-between align-items-center px-2">
+            <input
+              type="text"
+              required
+              className="w-50"
+              name="email"
+              value={email}
+              id="email"
+              onChange={handleChange}
+            />
+            <span
+              style={{ fontSize: "1.2em", fontWeight: "600" }}
+              className="w-50"
+            >
+              @riyadh-cables.com
+            </span>
+          </div>
+        </div>
+        <div className="innerGridTemplate borderBottom">
+          <div className="d-flex justify-content-between px-2 borderRight py-2">
+            <label className="" htmlFor="loginName">
+              Login Name (VPN)
+            </label>
+            <span>:</span>
+          </div>
+          <input
+            type="text"
+            required
+            className="px-2"
+            name="loginName"
+            id="loginName"
+            value={loginName}
+            onChange={handleChange}
+          />
+        </div>
+        <div className="innerGridTemplate borderBottom">
+          <div className="d-flex justify-content-between px-2 borderRight py-2">
+            <label className="">Email Type</label>
+            <span>:</span>
+          </div>
+          <div className="d-md-flex py-2">
+            <div className="d-flex align-items-center px-2 gap-3 w50">
+              <input
+                type="checkbox"
+                className=""
+                checked={emailType.internal}
+                name="emailType"
+                onClick={() => {
+                  this.setState({
+                    user: {
+                      ...user,
+                      emailType: {
+                        internal: true,
+                        internalExternal: false,
+                      },
+                    },
+                  });
+                }}
+              />
+              <label>Internal Only</label>
+            </div>
+            <div className="d-flex align-items-center px-2 gap-3 w50">
+              <input
+                type="checkbox"
+                className=""
+                checked={emailType.internalExternal}
+                name="emailType"
+                onClick={() => {
+                  this.setState({
+                    user: {
+                      ...user,
+                      emailType: {
+                        internal: false,
+                        internalExternal: true,
+                      },
+                    },
+                  });
+                }}
+              />
+              <label> Internal & External</label>
+            </div>
+          </div>
+        </div>
+        <div className="innerGridTemplate borderBottom">
+          <div className="d-flex justify-content-between px-2 borderRight py-2">
+            <label className="">Internet Access</label>
+            <span>:</span>
+          </div>
+          <div className="d-md-flex py-2">
+            <div className="d-flex align-items-center px-2 gap-3 w-50">
+              <input
+                type="checkbox"
+                className=""
+                name="internetAccess"
+                checked={internetAccess.Yes}
+                onClick={() => {
+                  this.setState({
+                    user: {
+                      ...user,
+                      internetAccess: {
+                        Yes: true,
+                        No: false,
+                      },
+                    },
+                  });
+                }}
+              />
+              <label>Yes</label>
+            </div>
+            <div className="d-flex align-items-center px-2 gap-3 w-50">
+              <input
+                type="checkbox"
+                className=""
+                name="internetAccess"
+                checked={internetAccess.No}
+                onClick={() => {
+                  this.setState({
+                    user: {
+                      ...user,
+                      internetAccess: {
+                        Yes: false,
+                        No: true,
+                      },
+                    },
+                  });
+                }}
+              />
+              <label>No</label>
+            </div>
+          </div>
+        </div>
+        <div className="innerGridTemplate borderBottom">
+          <div className="d-flex justify-content-between px-2 borderRight py-2">
+            <label className="" htmlFor="remarks">
+              Remarks
+            </label>
+            <span>:</span>
+          </div>
+          <input
+            type="text"
+            required
+            className="px-2"
+            name="remarks"
+            id="remarks"
+            value={remarks}
+            onChange={handleChange}
+          />
+        </div>
+        <div className="innerGridTemplate borderBottom">
+          <div className="d-flex justify-content-between px-2 borderRight py-2">
+            <label className="text-danger fw-bolder" htmlFor="itsm">
+              ITSM
+            </label>
+            <span>:</span>
+          </div>
+          <input
+            type="text"
+            required
+            className="px-2"
+            name="itsm"
+            id="itsm"
+            value={itsm}
+            onChange={handleChange}
+          />
+        </div>
+        <div className="d-flex justify-content-end px-3 py-2">
+          <button
+            type="submit"
+            className="text-white px-3 py-2 rounded"
+            style={{
+              border: "none",
+              backgroundColor: " rgb(181, 77, 38)",
+            }}
+          >
+            Submit
+          </button>
+        </div>
+      </form>
+      <div className="border border-3 border-dark mb-5">
+        <div
+          className="tripleGrid bg-light borderBottom"
+          style={{ fontSize: "1.2em", fontWeight: "600" }}
+        >
+          <div className="borderRight p-2">Business Approval</div>
+          <div className="borderRight p-2">Name</div>
+          <div className="p-2">Signature</div>
+        </div>
+        <div
+          className="tripleGrid borderBottom"
+          style={{ fontSize: "1.2em", fontWeight: "600" }}
+        >
+          <div className="borderRight p-2 d-flex justify-content-between">
+            <div>Department Head</div>
+            <div>:</div>
+          </div>
+          <div className="borderRight p-2"></div>
+          <div className="p-2"></div>
+        </div>
+        <div>
+          <div className="px-2 pt-2">Note(s)</div>
+          <div className="px-2" style={{ textIndent: "25px" }}>
+            1. Department Head (VP / GM / Deputy GM)
+          </div>
+          <div className="px-2 pb-2" style={{ textIndent: "25px" }}>
+            2. If name & signature are not clear, the form will be rejected.
+          </div>
+        </div>
+      </div>
+      <div className="border border-3 border-dark mb-5">
+        <div
+          className="tripleGrid bg-light borderBottom"
+          style={{ fontSize: "1.2em", fontWeight: "600" }}
+        >
+          <div className="borderRight p-2">IT Approval</div>
+          <div className="borderRight p-2">Name</div>
+          <div className="p-2">Signature</div>
+        </div>
+        <div
+          className="tripleGrid borderBottom"
+          style={{ fontSize: "1.2em", fontWeight: "600" }}
+        >
+          <div className="borderRight p-2 d-flex justify-content-between">
+            <div>Department Head</div>
+            <div>:</div>
+          </div>
+          <div className="borderRight p-2">Ahmed Kotb</div>
+          <div className="p-2"></div>
+        </div>
+        <div>
+          <div className="px-2 pt-2">Note(s)</div>
+          <div className="px-2" style={{ textIndent: "25px" }}>
+            1. Department Head (CIO / IT Infrastructure Manager)
+          </div>
+          <div className="px-2 pb-2" style={{ textIndent: "25px" }}>
+            2. If name & signature are not clear, the form will be rejected.
+          </div>
+        </div>
+      </div>
+      <div className="border border-3 border-dark mb-5">
+        <div
+          className="tripleGrid bg-light borderBottom"
+          style={{ fontSize: "1.2em", fontWeight: "600" }}
+        >
+          <div className="borderRight p-2">Executed by</div>
+          <div className="borderRight p-2">Name</div>
+          <div className="p-2">Signature</div>
+        </div>
+        <div
+          className="tripleGrid borderBottom"
+          style={{ fontSize: "1.2em", fontWeight: "600" }}
+        >
+          <div className="borderRight p-2 d-flex justify-content-between">
+            <div>Authorized IT</div>
+            <div>:</div>
+          </div>
+          <div className="borderRight p-2"></div>
+          <div className="p-2"></div>
+        </div>
+        <div className="innerGridTemplate">
+          <div className="d-flex justify-content-between px-2 borderRight py-2">
+            <label className="">Date</label>
+            <span>:</span>
+          </div>
+          <div className="px-2"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</Modal>;
+
+
+import { WebPartContext } from "@microsoft/sp-webpart-base";
+import { Modal } from "antd";
+import * as React from "react";
+import "./index.css";
+
+export interface INewUserFormViewProps {
+  self: any;
+  title: string;
+  context: WebPartContext;
+  modalOpen: boolean;
+  handleClose: () => void;
+  modalData: any;
+  isDataLoading: boolean;
+}
+interface INewUserFormViewState {}
+
+interface DataType {
+  key: React.Key;
+  Title: string;
+  LoginName: string;
+  Status: string;
+  Department: string;
+  Date: string;
+  EmailType: string;
+  InternetAccess: string;
+  Remarks: string;
+  ITSM: string;
+  CreatedBy: string;
+  PendingWith: string;
+  BusinessApproval: string;
+  ITApproval: string;
+}
+export default class NewUserFormView extends React.Component<
+  INewUserFormViewProps,
+  INewUserFormViewState
+> {
+  public constructor(
+    props: INewUserFormViewProps,
+    state: INewUserFormViewState
+  ) {
+    super(props);
+    this.state = {};
+  }
+  public componentDidMount(): void {}
+
+  public render(): React.ReactElement<INewUserFormViewProps> {
+    const { modalOpen, handleClose, modalData, isDataLoading, context } =
+      this.props;
+
+    return (
+      <Modal
+        footer={false}
+        centered={true}
+        open={modalOpen}
+        onOk={handleClose}
+        onCancel={handleClose}
+      >
+        {isDataLoading ? (
+          <div
+            className="d-flex justify-content-center align-items-center flex-column"
+            style={{ height: "200px" }}
+          >
+            <div className="spinner-border text-info" role="status" />
+            <div className="fs-6 fw-medium mt-3">Loading....</div>
+          </div>
+        ) : (
+          <div>
+            <div className="container-lg">
+              <div className="d-flex justify-content-center">
+                <div className="">
+                  {modalData?.map((data: DataType) => (
+                    <div>
+                      <div className="border border-2 border-dark">
+                        <tr>
+                          <th>User Creation Request</th>
+                        </tr>
+                        <tr className="">
+                          <td>Department</td>
+                          <td>:</td>
+                          <td>{data.Department}</td>
+                        </tr>
+                        <tr className="">
+                          <td>Email Display Name</td>
+                          <td>:</td>
+                          <td>{data.Title}</td>
+                        </tr>
+                        <tr className="">
+                          <td>Login Name (VPN)</td>
+                          <td>:</td>
+                          <td>{data.LoginName}</td>
+                        </tr>
+                        <tr className="">
+                          <td>Email Type</td>
+                          <td>:</td>
+                          <td>{data.EmailType}</td>
+                        </tr>
+                        <tr className="">
+                          <td>Internet Access</td>
+                          <td>:</td>
+                          <td>{data.InternetAccess}</td>
+                        </tr>
+                        <tr className="">
+                          <td>Remarks</td>
+                          <td>:</td>
+                          <td>{data.Remarks}</td>
+                        </tr>
+                        <tr className="">
+                          <td>ITSM</td>
+                          <td>:</td>
+                          <td>{data.ITSM}</td>
+                        </tr>
+                        <tr className="">
+                          <td>Created By</td>
+                          <td>:</td>
+                          <td>{data.CreatedBy}</td>
+                        </tr>
+                        <tr className="">
+                          <td>Pending With</td>
+                          <td>:</td>
+                          <td>{data.PendingWith}</td>
+                        </tr>
+                        <tr className="">
+                          <td>Business Approval Status</td>
+                          <td>:</td>
+                          <td>{data.BusinessApproval}</td>
+                        </tr>
+                        <tr className="">
+                          <td>IT Approval Status</td>
+                          <td>:</td>
+                          <td>{data.ITApproval}</td>
+                        </tr>
+                      </div>
+                      {data.PendingWith ===
+                      context.pageContext.user.displayName ? (
+                        <div className="d-flex mt-3 gap-3">
+                          <button
+                            type="submit"
+                            className="text-white bg-success px-3 py-2 rounded"
+                            style={{
+                              border: "none",
+                            }}
+                          >
+                            Approve
+                          </button>
+                          <button
+                            type="submit"
+                            className="text-white bg-danger px-3 py-2 rounded"
+                            style={{
+                              border: "none",
+                            }}
+                          >
+                            Reject
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="mt-3 px-2">
+                          {data.BusinessApproval === "Pending" && (
+                            <span
+                              className="fw-medium fs-6"
+                              style={{ color: "rgb(181, 77, 38)" }}
+                            >
+                              User Created by you has been send for Business
+                              Approval.
+                            </span>
+                          )}
+                          {data.BusinessApproval === "Approved" && (
+                            <span className="text-success fw-medium fs-6">
+                              User Created by you has been Approved by Business
+                              Team and is waiting for IT Approval.
+                            </span>
+                          )}
+                          {data.BusinessApproval === "Rejected" && (
+                            <span className="text-danger fw-medium fs-6">
+                              User Created by you has been Rejected by Business
+                              Team.
+                            </span>
+                          )}
+                          {data.ITApproval === "Approved" && (
+                            <span className="text-success fw-medium fs-6">
+                              User Created by you has been Approved by IT Team.
+                            </span>
+                          )}
+                          {data.ITApproval === "Rejected" && (
+                            <span className="text-danger fw-medium fs-6">
+                              User Created by you has been Rejected by IT Team.
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </Modal>
+    );
+  }
+}
+
+<Modal
+        title={`${title} Form`}
+        footer={false}
+        centered={false}
+        open={modalOpen}
+        onOk={handleClose}
+        onCancel={handleClose}
+        style={{ top: 10 }}
+        width={"100vw"}
+      >
+        <div className="bg-white">
+          <div className="container">
+            <div className="text-center">
+              {headerLogo?.map(
+                (header: {
+                  AttachmentFiles: { ServerRelativeUrl: string }[];
+                  Height: any;
+                  Width: any;
+                }) => (
+                  <img
+                    src={
+                      context.pageContext.web.absoluteUrl
+                        .split("/")
+                        .slice(0, 3)
+                        .join("/") +
+                      header?.AttachmentFiles[0]?.ServerRelativeUrl
+                    }
+                    height={`${header.Height}`}
+                    width={`${header.Width}`}
+                    className=""
+                  />
+                )
+              )}
+            </div>
+            <div className="text-center">IT Department</div>
+            <h4 className="text-center">New Loan Request</h4>
+            <form className="border border-3 border-dark mb-5">
+              <div
+                className="text-center bg-light borderBottom"
+                style={{ fontSize: "1.25em", fontWeight: "600" }}
+              >
+                Employee Information
+              </div>
+              <div className="gridTemplate borderBottom">
+                <div className="innerGridTemplate lgRight">
+                  <div className="d-flex justify-content-between px-2 borderRight align-items-center py-2">
+                    <label className="">Department</label>
+                    <span>:</span>
+                  </div>
+                  <input type="text" required className="px-2" />
+                </div>
+                <div className="mobileGrid lgBorderRight">
+                  <div className="d-flex borderRight justify-content-between px-2 align-items-center py-2 LGw25SMw0">
+                    <label className="">Date</label>
+                    <span>:</span>
+                  </div>
+                  <input type="date" className="px-2" />
+                </div>
+              </div>
+              <div className="gridTemplate borderBottom">
+                <div className="innerGridTemplate lgRight">
+                  <div className="d-flex justify-content-between px-2 borderRight align-items-center py-2">
+                    <label className="">Employee Name</label>
+                    <span>:</span>
+                  </div>
+                  <input type="text" required className="px-2" />
+                </div>
+                <div className="mobileGrid lgBorderRight">
+                  <div className="d-flex borderRight justify-content-between px-2 align-items-center py-2 LGw25SMw0">
+                    <label className="">ID</label>
+                    <span>:</span>
+                  </div>
+                  <input type="text" className="px-2" />
+                </div>
+              </div>
+              <div className="gridTemplate borderBottom">
+                <div className="innerGridTemplate lgRight">
+                  <div className="d-flex justify-content-between px-2 borderRight align-items-center py-2">
+                    <label className="">Job Title</label>
+                    <span>:</span>
+                  </div>
+                  <input type="text" required className="px-2" />
+                </div>
+                <div className="mobileGrid lgBorderRight">
+                  <div className="d-flex borderRight justify-content-between px-2 align-items-center py-2 LGw25SMw0">
+                    <label className="">Ext</label>
+                    <span>:</span>
+                  </div>
+                  <input type="text" className="px-2" />
+                </div>
+              </div>
+              <div className="innerGridTemplate borderBottom">
+                <div className="d-flex justify-content-between px-2 borderRight py-2">
+                  <label className="">Loan Type</label>
+                  <span>:</span>
+                </div>
+                <div className="d-md-flex py-2 justify-content-between">
+                  <div className="d-flex align-items-center px-2 gap-3">
+                    <input type="checkbox" required className="" />
+                    <label>Personal Loan</label>
+                  </div>
+                  <div className="d-flex align-items-center px-2 gap-3">
+                    <input type="checkbox" required className="" />
+                    <label>Housing Loan</label>
+                  </div>
+                  <div className="d-flex align-items-center px-2 gap-3">
+                    <input type="checkbox" required className="" />
+                    <label>Dependent Loan</label>
+                  </div>
+                </div>
+              </div>
+
+              <div className="innerGridTemplate borderBottom">
+                <div className="d-flex justify-content-between px-2 borderRight py-2">
+                  <label className="">Amount in Digits</label>
+                  <span>:</span>
+                </div>
+                <input type="text" required className="px-2" />
+              </div>
+              <div className="innerGridTemplate">
+                <div className="d-flex justify-content-between px-2 borderRight py-2">
+                  <label className="text-danger fw-bolder">
+                    Amount in Text
+                  </label>
+                  <span>:</span>
+                </div>
+                <input type="text" required className="px-2" />
+              </div>
+            </form>
+            <div className="border border-3 border-dark mb-5">
+              <div
+                className="tripleGrid bg-light borderBottom"
+                style={{ fontSize: "1.2em", fontWeight: "600" }}
+              >
+                <div className="borderRight p-2">Business Approval</div>
+                <div className="borderRight p-2">Name</div>
+                <div className="p-2">Signature</div>
+              </div>
+              <div
+                className="tripleGrid borderBottom"
+                style={{ fontSize: "1.2em", fontWeight: "600" }}
+              >
+                <div className="borderRight p-2 d-flex justify-content-between">
+                  <div>Department Head</div>
+                  <span>:</span>
+                </div>
+                <div className="borderRight p-2"></div>
+                <div className="p-2"></div>
+              </div>
+              <div>
+                <div className="px-2 pt-2">Note(s)</div>
+                <div className="px-2" style={{ textIndent: "25px" }}>
+                  1. Department Head (Direct Manager)
+                </div>
+                <div className="px-2 pb-2" style={{ textIndent: "25px" }}>
+                  2. If name & signature are not clear, the form will be
+                  rejected.
+                </div>
+              </div>
+            </div>
+            <div className="border border-3 border-dark mb-5">
+              <div
+                className="tripleGrid bg-light borderBottom"
+                style={{ fontSize: "1.2em", fontWeight: "600" }}
+              >
+                <div className="borderRight p-2">HR Approval</div>
+                <div className="borderRight p-2">Name</div>
+                <div className="p-2">Signature</div>
+              </div>
+              <div
+                className="tripleGrid borderBottom"
+                style={{ fontSize: "1.2em", fontWeight: "600" }}
+              >
+                <div className="borderRight p-2 d-flex justify-content-between">
+                  <div>Payroll Team</div>
+                  <span>:</span>
+                </div>
+                <div className="borderRight p-2"></div>
+                <div className="p-2"></div>
+              </div>
+              <div
+                className="tripleGrid"
+                style={{ fontSize: "1.2em", fontWeight: "600" }}
+              >
+                <div className="borderRight p-2 d-flex justify-content-between">
+                  <div>Department Head</div>
+                  <span>:</span>
+                </div>
+                <div className="borderRight p-2"></div>
+                <div className="p-2"></div>
+              </div>
+            </div>
+            <div className="border border-3 border-dark mb-5">
+              <div
+                className="tripleGrid bg-light borderBottom"
+                style={{ fontSize: "1.2em", fontWeight: "600" }}
+              >
+                <div className="borderRight p-2">Finance Approval</div>
+                <div className="borderRight p-2">Name</div>
+                <div className="p-2">Signature</div>
+              </div>
+              <div
+                className="tripleGrid borderBottom"
+                style={{ fontSize: "1.2em", fontWeight: "600" }}
+              >
+                <div className="borderRight p-2 d-flex justify-content-between">
+                  <div>Department Head</div>
+                  <span>:</span>
+                </div>
+                <div className="borderRight p-2"></div>
+                <div className="p-2"></div>
+              </div>
+              <div
+                className="tripleGrid"
+                style={{ fontSize: "1.2em", fontWeight: "600" }}
+              >
+                <div className="borderRight p-2 d-flex justify-content-between">
+                  <div>Payment Incharge</div>
+                  <span>:</span>
+                </div>
+                <div className="borderRight p-2"></div>
+                <div className="p-2"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Modal>

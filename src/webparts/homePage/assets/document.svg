@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="23" height="31.5" viewBox="0 0 23 31.5">
+    <g data-name="Group 4" transform="translate(-489 -827.5)">
+        <g data-name="Group 3">
+            <g data-name="Rectangle 13" transform="rotate(90 -166.419 661.082)" style="stroke:#495866;fill:#495866">
+                <rect width="15.858" height="2.265" rx="1" style="stroke:none"/>
+                <rect x=".5" y=".5" width="14.858" height="1.265" rx=".5" style="fill:none"/>
+            </g>
+            <g data-name="Rectangle 14" transform="rotate(90 -163.02 664.48)" style="stroke:#495866;fill:#495866">
+                <rect width="15.858" height="2.265" rx="1" style="stroke:none"/>
+                <rect x=".5" y=".5" width="14.858" height="1.265" rx=".5" style="fill:none"/>
+            </g>
+            <g data-name="Rectangle 15" transform="rotate(90 -159.622 667.878)" style="stroke:#495866;fill:#495866">
+                <rect width="15.858" height="2.265" rx="1" style="stroke:none"/>
+                <rect x=".5" y=".5" width="14.858" height="1.265" rx=".5" style="fill:none"/>
+            </g>
+        </g>
+        <rect data-name="Rectangle 7" width="23" height="30" rx="1" transform="translate(489 829)" style="fill:#495866"/>
+        <rect data-name="Rectangle 8" width="15" height="2" rx="1" transform="translate(493 834)" style="fill:#fff"/>
+        <rect data-name="Rectangle 16" width="15" height="2" rx="1" transform="translate(493 839)" style="fill:#fff"/>
+        <rect data-name="Rectangle 17" width="15" height="2" rx="1" transform="translate(493 844)" style="fill:#fff"/>
+        <rect data-name="Rectangle 18" width="15" height="2" rx="1" transform="translate(493 849)" style="fill:#fff"/>
+    </g>
+</svg>

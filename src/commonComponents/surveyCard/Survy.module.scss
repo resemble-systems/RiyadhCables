@@ -1,0 +1,23 @@
+.scroll {
+  border-radius: 1px;
+}
+
+.surveyDescription {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.SurveyContainer {
+  height: 420px;
+  overflow-y: scroll;
+}
+
+@media only screen and (max-width: 991px) {
+  .SurveyContainer {
+    height: auto;
+    max-height: 420px;
+    overflow-y: scroll;
+  }
+}

@@ -1,0 +1,12 @@
+.PollsContainer {
+    height: 420px;
+    overflow-y: scroll;
+  }
+  
+  @media only screen and (max-width: 991px) {
+    .PollsContainer {
+      height: auto;
+      max-height: 420px;
+      overflow-y: scroll;
+    }
+  }

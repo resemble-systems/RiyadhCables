@@ -1,0 +1,126 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "home-page-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/homePage/HomePageWebPart.js",
+          "manifest": "./src/webparts/homePage/HomePageWebPart.manifest.json"
+        }
+      ]
+    },
+    "department-page-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/departmentPage/DepartmentPageWebPart.js",
+          "manifest": "./src/webparts/departmentPage/DepartmentPageWebPart.manifest.json"
+        }
+      ]
+    },
+    "document-page-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/documentPage/DocumentPageWebPart.js",
+          "manifest": "./src/webparts/documentPage/DocumentPageWebPart.manifest.json"
+        }
+      ]
+    },
+    "banner-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/banner/BannerWebPart.js",
+          "manifest": "./src/webparts/banner/BannerWebPart.manifest.json"
+        }
+      ]
+    },
+    "header-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/header/HeaderWebPart.js",
+          "manifest": "./src/webparts/header/HeaderWebPart.manifest.json"
+        }
+      ]
+    },
+    "news-page-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/newsPage/NewsPageWebPart.js",
+          "manifest": "./src/webparts/newsPage/NewsPageWebPart.manifest.json"
+        }
+      ]
+    },
+    "gallery-page-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/galleryPage/GalleryPageWebPart.js",
+          "manifest": "./src/webparts/galleryPage/GalleryPageWebPart.manifest.json"
+        }
+      ]
+    },
+    "footer-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/footer/FooterWebPart.js",
+          "manifest": "./src/webparts/footer/FooterWebPart.manifest.json"
+        }
+      ]
+    },
+    "about-page-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/aboutPage/AboutPageWebPart.js",
+          "manifest": "./src/webparts/aboutPage/AboutPageWebPart.manifest.json"
+        }
+      ]
+    },
+    "details-page-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/detailsPage/DetailsPageWebPart.js",
+          "manifest": "./src/webparts/detailsPage/DetailsPageWebPart.manifest.json"
+        }
+      ]
+    },
+    "work-flow-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/workFlow/WorkFlowWebPart.js",
+          "manifest": "./src/webparts/workFlow/WorkFlowWebPart.manifest.json"
+        }
+      ]
+    },
+    "admin-dasboard-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/adminDasboard/AdminDasboardWebPart.js",
+          "manifest": "./src/webparts/adminDasboard/AdminDasboardWebPart.manifest.json"
+        }
+      ]
+    },
+    "payment-request-print-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/paymentRequestPrint/PaymentRequestPrintWebPart.js",
+          "manifest": "./src/webparts/paymentRequestPrint/PaymentRequestPrintWebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "HomePageWebPartStrings": "lib/webparts/homePage/loc/{locale}.js",
+    "DepartmentPageWebPartStrings": "lib/webparts/departmentPage/loc/{locale}.js",
+    "DocumentPageWebPartStrings": "lib/webparts/documentPage/loc/{locale}.js",
+    "BannerWebPartStrings": "lib/webparts/banner/loc/{locale}.js",
+    "HeaderWebPartStrings": "lib/webparts/header/loc/{locale}.js",
+    "NewsPageWebPartStrings": "lib/webparts/newsPage/loc/{locale}.js",
+    "GalleryPageWebPartStrings": "lib/webparts/galleryPage/loc/{locale}.js",
+    "FooterWebPartStrings": "lib/webparts/footer/loc/{locale}.js",
+    "AboutPageWebPartStrings": "lib/webparts/aboutPage/loc/{locale}.js",
+    "DetailsPageWebPartStrings": "lib/webparts/detailsPage/loc/{locale}.js",
+    "WorkFlowWebPartStrings": "lib/webparts/workFlow/loc/{locale}.js",
+    "AdminDasboardWebPartStrings": "lib/webparts/adminDasboard/loc/{locale}.js",
+    "PaymentRequestPrintWebPartStrings": "lib/webparts/paymentRequestPrint/loc/{locale}.js"
+  }
+}

@@ -1,0 +1,59 @@
+#calendar
+    width: 100% !important
+    max-width: 100% !important
+    min-width: 100% !important
+    height: 100% !important
+
+.calendar_year_display
+    color: #000000 !important
+    font-size: 20px !important
+    font-family: Oswald !important
+    font-weight: 400 !important
+
+.calendar_month_display
+    color: #000000
+    font-size: 18px !important
+    font-weight: 400 !important
+
+.calendar_cell
+    height: 66px !important
+
+.cardName
+    font-size: 1.25em
+    font-family: Oswald
+
+.meetTitle
+    text-decoration: none
+    text-transform: capitalize
+    padding: 3px
+    font-size: 14px
+    font-family: Avenir Next
+    color: #24396F !important
+    font-weight: 600
+    cursor: pointer
+    &:hover
+        color: #24396F !important
+
+.meetLink
+    text-decoration: none
+    text-transform: capitalize
+    padding: 3px
+    font-size: 12px
+    color: #24396F !important
+    font-weight: 600
+    cursor: pointer
+    display: flex
+    justify-content: flex-end
+    &:hover
+        color: #24396F !important
+
+@media only screen and (max-width: 425px)
+    .calendar_year_display
+        font-size: 15px !important
+    .calendar_month_display
+        font-size: 11px !important
+@media only screen and (max-width: 1024px)
+    .calendar_year_display
+        font-size: 16px !important
+    .calendar_month_display
+        font-size: 12px !important

@@ -1,0 +1,78 @@
+#sp-appBar {
+  display: none;
+}
+#spSiteHeader {
+  display: none;
+}
+#SuiteNavPlaceholder {
+  display: none;
+}
+#spLeftNav {
+  display: none;
+}
+#spCommandBar {
+  display: none;
+}
+.sp-appBar {
+  display: none;
+}
+.commandBarWrapper {
+  display: none;
+}
+#CommentsWrapper {
+  display: none;
+}
+.borderRight {
+  border-right: 1px solid gray;
+}
+.borderBottom {
+  border-bottom: 1px solid gray;
+}
+.Border {
+  border: 1px solid gray;
+}
+.iFrameContainer {
+  height: calc(100vh - 50px);
+  box-sizing: border-box;
+  padding-bottom: 20px;
+}
+@media (min-width: 1601px) and (max-width: 2800px) {
+  .CanvasComponent {
+    width: 101%;
+  }
+}
+@media (min-width: 1321px) and (max-width: 1600px) {
+  .CanvasComponent {
+    width: 101.3%;
+  }
+}
+@media (min-width: 1051px) and (max-width: 1320px) {
+  .CanvasComponent {
+    width: 101.8%;
+  }
+}
+@media (min-width: 921px) and (max-width: 1050px) {
+  .CanvasComponent {
+    width: 102.3%;
+  }
+}
+@media (min-width: 740px) and (max-width: 920px) {
+  .CanvasComponent {
+    width: 102.5%;
+  }
+}
+@media (min-width: 521px) and (max-width: 740px) {
+  .CanvasComponent {
+    width: 104%;
+  }
+}
+@media (min-width: 400px) and (max-width: 520px) {
+  .CanvasComponent {
+    width: 105.5%;
+  }
+}
+@media (min-width: 100px) and (max-width: 399px) {
+  .CanvasComponent {
+    width: 105.5%;
+  }
+}

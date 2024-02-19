@@ -1,0 +1,10 @@
+@font-face {
+  font-family: "Avenir Next";
+  src: url("https://resembleae.sharepoint.com/sites/RiyadhCable/SiteAssets/font/AvenirNext-Medium.woff2")
+      format("woff2"),
+    url("https://resembleae.sharepoint.com/sites/RiyadhCable/SiteAssets/font/AvenirNext-Medium.woff")
+      format("woff");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}

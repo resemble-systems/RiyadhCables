@@ -1,0 +1,10 @@
+.vipStatementContainer {
+  height: 420px;
+}
+@media only screen and (max-width: 768px) {
+  .vipStatementContainer {
+    height: auto;
+    max-height: 420px;
+    overflow-y: scroll;
+  }
+}

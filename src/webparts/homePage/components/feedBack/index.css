@@ -1,0 +1,10 @@
+.feedbackContainer {
+  height: 420px;
+}
+@media only screen and (max-width: 768px) {
+  .feedbackContainer {
+    height: auto;
+    max-height: 420px;
+    overflow-y: scroll;
+  }
+}

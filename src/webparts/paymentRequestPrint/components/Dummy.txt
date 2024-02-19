@@ -1,0 +1,250 @@
+ /* const headElement = (
+      Name: string,
+      Approver: string,
+      ApproverTime: string
+    ) => {
+      const element = (
+        <div className="d-flex borderBottom">
+          <div className="w-25 borderRight p-1">{Name}</div>
+          <div className="w-75 d-flex">
+            <div className="w-50 borderRight">
+              <div className="p-1">{Approver}</div>
+            </div>
+            <div className="w-50 d-flex">
+              <div className="w-25 borderRight p-1">Date</div>
+              <div className="p-1">
+                {new Date(ApproverTime).toLocaleDateString()}{" "}
+                {new Date(ApproverTime).toLocaleTimeString()}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+      return element;
+    }; */
+ <div className="" style={{ fontFamily: "Avenir Next" }}>
+        {Logo?.map((header: any) => {
+          return (
+            <div className="d-flex justify-content-center">
+              <img
+                src={
+                  context.pageContext.web.absoluteUrl
+                    .split("/")
+                    .slice(0, 3)
+                    .join("/") + header?.AttachmentFiles[0]?.ServerRelativeUrl
+                }
+                height={`80px`}
+                className=""
+              />
+            </div>
+          );
+        })}
+        <h5 className="d-flex justify-content-center">Payment Request</h5>
+        {paymentData?.map((data: PaymentData) => (
+          <>
+            <iframe src={pdfFile} width={"100%"} height={1000}></iframe>
+            <div className="Border">
+              <h6 className="borderBottom p-1 m-0">Requesters Information</h6>
+              <div className="d-flex">
+                <div className="w-50">
+                  <div className="d-flex borderBottom ">
+                    <div className="w-25 borderRight p-1">Department</div>
+                    <div className="borderRight p-1 w-75">
+                      {data.Department}
+                    </div>
+                  </div>
+                  <div className="d-flex borderBottom ">
+                    <div className="w-25 borderRight p-1">Requestor</div>
+                    <div className="borderRight p-1 w-75">{data.Title}</div>
+                  </div>
+                </div>
+                <div className="w-50">
+                  <div className="d-flex borderBottom ">
+                    <div className="w-25 borderRight p-1">Date</div>
+                    <div className="p-1">
+                      {new Date(data.Date).toLocaleDateString()}
+                    </div>
+                  </div>
+                  <div className="d-flex borderBottom ">
+                    <div className="w-25 borderRight p-1">Ref #</div>
+                    <div className="p-1">{data.ReferenceNumber}</div>
+                  </div>
+                </div>
+              </div>
+              <div className="d-flex borderBottom">
+                <div className="w-25 borderRight p-1">Payment Type</div>
+                <div className="p-1">{data.PaymentType}</div>
+              </div>
+              <div className="d-flex">
+                <div className="w-25 borderRight borderBottom p-1 d-flex align-items-center">
+                  Attachments
+                </div>
+                <div className="w-75">
+                  {data.AttachmentsJSON?.filter(
+                    (item: { targetName: string }) =>
+                      item.targetName !== "ObtainedAttached"
+                  )?.map(
+                    (
+                      attachment: {
+                        refNumber: string;
+                        targetName: string;
+                        name: string;
+                      },
+                      index: number
+                    ) => (
+                      <div className={`d-flex borderBottom`} key={index}>
+                        <div className="w-50 borderRight p-1">
+                          {attachment.targetName === "Aggrement"
+                            ? "Agreement / Contract"
+                            : attachment.targetName === "ApprovalDocument"
+                            ? "Approval Document"
+                            : attachment.targetName === "Invoice"
+                            ? "Invoice / Proposal"
+                            : attachment.targetName === "SAPGR"
+                            ? "SAP GR"
+                            : attachment.targetName === "SAPPO"
+                            ? "SAP PO"
+                            : attachment.targetName === "ObtainedAttached"
+                            ? "Obtained & Attached"
+                            : ""}
+                        </div>
+                        <div className="w-50 p-1">{attachment.refNumber}</div>
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+              <div className="d-flex borderBottom">
+                <div className="w-25 borderRight p-1">Beneficiary Name</div>
+                <div className="p-1">{data.BeneficiaryName}</div>
+              </div>
+              <div className="d-flex borderBottom">
+                <div className="w-25 borderRight p-1">Beneficiary Bank</div>
+                <div className="p-1">{data.BeneficiaryBank}</div>
+              </div>
+              <div className="d-flex borderBottom">
+                <div className="w-25 borderRight p-1">Beneficiary IBAN</div>
+                <div className="p-1">{data.BeneficiaryIBAN}</div>
+              </div>
+              <div className="d-flex borderBottom">
+                <div className="w-25 borderRight p-1">SAP Vendor #</div>
+                <div className="p-1">{data.SAPVendor}</div>
+              </div>
+              <div className="d-flex borderBottom">
+                <div className="w-25 borderRight p-1 d-flex align-items-center">
+                  Purpose &<br></br>Comments
+                </div>
+                <div className="w-75 d-flex">
+                  <div className="p-1 borderRight w-75">{data.Comments}</div>
+                  <div className="w-25">
+                    <div className="d-flex borderBottom">
+                      <div className="w-50 borderRight p-1">Currency</div>
+                      <div className="p-1">{data.Currency}</div>
+                    </div>
+                    <div className="d-flex borderBottom">
+                      <div className="w-50 borderRight p-1">Amount</div>
+                      <div className="p-1">{data.Amount}</div>
+                    </div>
+                    <div className="d-flex borderBottom">
+                      <div className="w-50 borderRight p-1">VAT</div>
+                      <div className="p-1">
+                        {data.VAT == "Yes"
+                          ? parseInt(data.Total) - parseInt(data.Amount)
+                          : "0"}
+                      </div>
+                    </div>
+                    <div className="d-flex">
+                      <div className="w-50 borderRight p-1">Total</div>
+                      <div className="p-1">{data.Total}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="d-flex borderBottom">
+                <div className="w-25 borderRight p-1">Amount In Words</div>
+                <div className="p-1">
+                  {data.AmountInWords} {data.Currency}
+                </div>
+              </div>
+              <div className="d-flex borderBottom">
+                <div className="w-25 borderRight p-1">Previous Approval</div>
+                <div className="p-1">{data.PreviousApproval}</div>
+              </div>
+              {headElement("Prepared By", data.CreatedBy, data.Date)}
+              {data.BusinessApproval === "Approved" &&
+                headElement(
+                  "Mid Level Manager",
+                  data.BusinessApprover,
+                  data.BusinessApprovalTime
+                )}
+              {data.DepartmentHeadApproval === "Approved" &&
+                headElement(
+                  "Department Head",
+                  data.DepartmentHeadApprover,
+                  data.DepartmentHeadApprovalTime
+                )}
+              {data.ARTeamApproval === "Approved" &&
+                headElement(
+                  "AR Team",
+                  data.ARTeamApprover,
+                  data.ARTeamApprovalTime
+                )}
+              {data.APTeamApproval === "Approved" &&
+                headElement(
+                  "AP Team",
+                  data.APTeamApprover,
+                  data.APTeamApprovalTime
+                )}
+              {data.CashTeamApproval === "Approved" &&
+                headElement(
+                  "Cash Team",
+                  data.CashTeamApprover,
+                  data.CashTeamApprovalTime
+                )}
+              {data.APHeadApproval === "Approved" &&
+                headElement(
+                  "AP Head",
+                  data.APHeadApprover,
+                  data.APHeadApprovalTime
+                )}
+              {data.ARHeadApproval === "Approved" &&
+                headElement(
+                  "AR Head",
+                  data.ARHeadApprover,
+                  data.ARHeadApprovalTime
+                )}
+              {data.CashHeadApprover === "Approved" &&
+                headElement(
+                  "Cash Head",
+                  data.CashHeadApprover,
+                  data.CashHeadApprovalTime
+                )}
+              {data.FinanceSecretaryApproval === "Approved" &&
+                headElement(
+                  "Finance Controller",
+                  data.FinanceControllerApprover,
+                  data.FinanceControllerApprovalTime
+                )}
+              {data.VPFinanceApproval === "Approved" &&
+                headElement(
+                  "VP Finance",
+                  data.VPFinanceApprover,
+                  data.VPFinanceApprovalTime
+                )}
+              {data.CFOApproval === "Approved" &&
+                headElement("CFO", data.CFO, data.CFOApprovalTime)}
+              {data.CEOApproval === "Approved" &&
+                headElement("CEO", data.CEO, data.CEOApprovalTime)}
+              {data.TreasuryApproval === "Approved" &&
+                headElement(
+                  "Treasury",
+                  data.TreasuryApproverName,
+                  data.TreasuryApprovalTime
+                )}
+              <div className="p-1 text-danger">
+                * All approvals are signed electronically
+              </div>
+            </div>
+          </>
+        ))}
+      </div>

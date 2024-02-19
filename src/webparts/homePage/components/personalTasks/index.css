@@ -1,0 +1,10 @@
+.taskContainer {
+  height: 400px;
+}
+@media only screen and (max-width: 768px) {
+  .taskContainer {
+    height: auto;
+    max-height: 400px;
+    overflow-y: scroll;
+  }
+}

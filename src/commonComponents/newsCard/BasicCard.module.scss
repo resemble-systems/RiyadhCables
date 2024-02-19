@@ -1,0 +1,51 @@
+.description {
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-family: "Avenir Next" !important;
+  max-height: 108px;
+}
+.headingTwo {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-family: "Avenir Next";
+}
+
+.headingOne {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: "Avenir Next";
+}
+
+.newsCard {
+  background-color: #f8f8f8;
+}
+.newsCard :hover {
+  transition: all 0.2s ease-out;
+  box-shadow: 0px 4px 8px rgba(38, 38, 38, 0.2);
+  top: -4px;
+  border: 1px solid #cccccc;
+  background-color: white;
+}
+
+@media (min-width: 0px) and (max-width: 575px) {
+  .marginBottom {
+    margin-bottom: 1rem;
+  }
+}
+
+@media (min-width: 0px) and (max-width: 575px) {
+  .description {
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-family: "Avenir Next";
+    height: auto;
+    max-height: 108px;
+  }
+}

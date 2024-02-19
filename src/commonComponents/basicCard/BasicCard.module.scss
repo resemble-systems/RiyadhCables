@@ -1,0 +1,40 @@
+.description {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-family: "Avenir Next" !important;
+  max-height: 48px;
+}
+
+.headingTwo {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-family: "Avenir Next";
+}
+
+.headingOne {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: "Avenir Next";
+}
+
+@media (min-width: 0px) and (max-width: 575px) {
+  .marginBottom {
+    margin-bottom: 1rem;
+  }
+}
+
+@media (min-width: 0px) and (max-width: 575px) {
+  .description {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-family: "Avenir Next";
+    height: auto;
+  }
+}
