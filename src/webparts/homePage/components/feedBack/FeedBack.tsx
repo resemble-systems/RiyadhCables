@@ -549,7 +549,7 @@ export default class FeedBack extends React.Component<
                           Response By{" "}
                         </div>
                         <div
-                          className="d-flex gap-2 p-2 ms-4 border border-primary"
+                          className="d-flex gap-2 p-2 border border-primary"
                           style={{ width: "max-content" }}
                         >
                           <div className="d-flex align-items-center">

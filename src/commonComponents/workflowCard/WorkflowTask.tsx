@@ -318,13 +318,24 @@ export default class WorkflowTask extends React.Component<
       }
     });
     const filteredData = departmentFilter?.filter((data: any) => {
-      if (PendingWith !== "Pending With" && PendingWith !== "IT Approvers") {
-        return data.PendingDepartment === PendingWith;
+      if (PendingWith === "VP Finance") {
+        return (
+          data.PendingDepartment === "VP Finance" ||
+          data.PendingDepartment === "Cash Team" ||
+          data.PendingDepartment === "AR Team" ||
+          data.PendingDepartment === "AP Team" ||
+          data.PendingDepartment === "Cash Head" ||
+          data.PendingDepartment === "AR Head" ||
+          data.PendingDepartment === "AP Head" ||
+          data.PendingDepartment === "Finance Controller"
+        );
       } else if (PendingWith === "IT Approvers") {
         return (
           data.PendingDepartment === "IT Approver" ||
           data.PendingDepartment === "IT Approvers"
         );
+      } else if (PendingWith !== "Pending With") {
+        return data.PendingDepartment === PendingWith;
       } else {
         return data;
       }
@@ -523,12 +534,6 @@ export default class WorkflowTask extends React.Component<
         selectedTable: value,
       });
       if (value === "All Requests") {
-        /* this.setState({
-          selectedPendingWith: "Pending With",
-          searchText: "",
-          selectedDepartment: "Department",
-          selectedDashboard: "Task Assigned to me",
-        }); */
         const newUser = newUserData?.map((data: any) => {
           return {
             ...data,
