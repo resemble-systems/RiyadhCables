@@ -111,6 +111,10 @@ export default class HomePage extends React.Component<
     const fa =
       "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css";
     let Avenir = `${this.props.context.pageContext.site.absoluteUrl}/SiteAssets/font/styles.css`;
+    console.log(
+      "Avenir Link",
+      `${this.props.context.pageContext.site.absoluteUrl}/SiteAssets/font/styles.css`
+    );
     /* const Montserrat =
       "https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&family=Open+Sans:wght@600&display=swap";
     const Roboto =

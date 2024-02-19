@@ -483,7 +483,7 @@ export default class TemplateNews extends React.Component<
       "https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css";
     const fa =
       "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css";
-    let Avenir = `${this.props.context.pageContext.site.absoluteUrl}/SiteAssets/font/styles.css`;
+    let Avenir = `${this.props.context.pageContext.site.absoluteUrl}/SiteAssets/font/style.css`;
     SPComponentLoader.loadCss(bootstarp5CSS);
     SPComponentLoader.loadCss(fa);
     SPComponentLoader.loadCss(Avenir);

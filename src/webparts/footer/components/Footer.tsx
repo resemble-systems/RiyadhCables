@@ -64,7 +64,7 @@ export default class Footer extends React.Component<
       "https://fonts.googleapis.com/css2?family=Montserrat:wght@100&family=Roboto:wght@100;300;400;500;700;900&display=swap";*/
     let fa =
       "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css";
-    let Avenir = `${this.props.context.pageContext.site.absoluteUrl}/SiteAssets/font/styles.css`;
+    let Avenir = `${this.props.context.pageContext.site.absoluteUrl}/SiteAssets/font/style.css`;
     SPComponentLoader.loadCss(bootstarp5CSS);
     /*  SPComponentLoader.loadCss(font); */
     SPComponentLoader.loadCss(fa);
