@@ -7,6 +7,10 @@
   font-display: swap;
 } */
 
+#spCommandBar {
+  display: none;
+}
+
 .b_a_6b55bba6 {
   display: none;
 }

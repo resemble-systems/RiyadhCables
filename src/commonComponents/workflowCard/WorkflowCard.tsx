@@ -24,6 +24,7 @@ export interface IWorkflowCardProps {
     manager: string;
     managerEmail: string;
   };
+  isAdmin: boolean;
 }
 export interface IWorkflowCardState {
   userModalOpen: boolean;
@@ -133,6 +134,7 @@ export default class WorkflowCard extends React.Component<
       context,
       getNewUser,
       selectedPersonDetails,
+      isAdmin
     } = this.props;
     const {
       userModalOpen,
@@ -406,6 +408,7 @@ export default class WorkflowCard extends React.Component<
             title={Title}
             toWords={toWords}
             context={context}
+            isAdmin={isAdmin}
             modalOpen={loanRequestModalOpen}
             handleClose={handleClose}
             headerLogo={""}

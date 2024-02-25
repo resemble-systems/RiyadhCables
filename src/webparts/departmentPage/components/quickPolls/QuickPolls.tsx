@@ -18,8 +18,36 @@ interface IQuickPollsState {
   quickPollsAsSorted: any;
   quickPollsChoice: any;
   isModalOpen: boolean;
-  modalData: any;
+  modalData: ModalDataFinalElement[];
   optionSelected: any;
+}
+
+export interface ModalDataFinalElement {
+  Answer: {
+    Option: string;
+    SelectedBy: { RespondantName: string; RespondantEmail: string }[];
+  }[];
+  Title: string;
+}
+
+export interface QuickPollModalData {
+  Title: string;
+  Choice: string | null;
+  Option1: string | null;
+  Option2: string | null;
+  Option3: string | null;
+  Option4: string | null;
+}
+
+export interface QuickPollModalChoice {
+  RespondantName: string;
+  RespondantEmail: string;
+  RespondantChoice: { Option: string; ID: number };
+}
+export interface QuickPollModalAnswer {
+  RespondantName: string;
+  RespondantEmail: string;
+  RespondantChoice: string;
 }
 
 export default class QuickPolls extends React.Component<
@@ -33,7 +61,7 @@ export default class QuickPolls extends React.Component<
       quickPollsAsSorted: [],
       quickPollsChoice: {},
       isModalOpen: false,
-      modalData: {},
+      modalData: [],
       optionSelected: "",
     };
   }
@@ -64,8 +92,56 @@ export default class QuickPolls extends React.Component<
           (a: any, b: any) =>
             new Date(b.Created).getTime() - new Date(a.Created).getTime()
         );
+        const modalData: ModalDataFinalElement[] = sortedItems
+          ?.map((data: QuickPollModalData) => {
+            const { Title, Choice, Option1, Option2, Option3, Option4 } = data;
+            const options = [Option1, Option2, Option3, Option4].filter(
+              Boolean
+            );
+            if (Choice) {
+              const choices = JSON.parse(Choice).map(
+                ({
+                  RespondantName,
+                  RespondantEmail,
+                  RespondantChoice,
+                }: QuickPollModalChoice) => ({
+                  RespondantEmail,
+                  RespondantName,
+                  RespondantChoice: RespondantChoice.Option,
+                })
+              );
+              const answers = options
+                .map((option: string) => {
+                  const selectedBy = choices
+                    .filter(
+                      ({ RespondantChoice }: QuickPollModalAnswer) =>
+                        option === RespondantChoice
+                    )
+                    .map(
+                      ({
+                        RespondantName,
+                        RespondantEmail,
+                      }: QuickPollModalAnswer) => ({
+                        RespondantName,
+                        RespondantEmail,
+                      })
+                    );
+
+                  return { Option: option, SelectedBy: selectedBy };
+                })
+                .filter(Boolean);
+              return answers.length ? { Title, Answer: answers } : null;
+            }
+            return null;
+          })
+          .filter(Boolean);
+
+        console.log("QuickPolls Answer Data", modalData);
         console.log("quickPollsAsSorted", sortedItems);
-        this.setState({ quickPollsAsSorted: sortedItems });
+        this.setState({
+          quickPollsAsSorted: sortedItems,
+          modalData: modalData,
+        });
       });
   };
 

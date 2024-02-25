@@ -49,23 +49,6 @@ export default class HomePage extends React.Component<
     console.log(ScreenWidth, "ScreenWidth");
     this.setState({ screenWidth: ScreenWidth });
     setTimeout(() => this.setState({ isLoading: false }), 2000);
-    setTimeout(() => {
-      const ArabicEN = document?.getElementById("isArabicEN");
-      const ArabicAR = document?.getElementById("isArabicAR");
-      console.log("ID ELEMENTS IN TIME OUT", ArabicEN, ArabicAR);
-      if (ArabicAR && ArabicEN) this.addEventListners(ArabicEN, ArabicAR);
-    }, 3000);
-  }
-
-  public addEventListners(ArabicEN: HTMLElement, ArabicAR: HTMLElement) {
-    ArabicEN.addEventListener("click", () => {
-      console.log("Clicked EN");
-      this.setState({ isArabic: false });
-    });
-    ArabicAR.addEventListener("click", () => {
-      console.log("Clicked AR");
-      this.setState({ isArabic: true });
-    });
   }
 
   public getUserDetails(): void {

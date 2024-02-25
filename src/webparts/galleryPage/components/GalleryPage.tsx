@@ -300,7 +300,7 @@ export default class GalleryPage extends React.Component<
     "https://fonts.googleapis.com/css2?family=Montserrat:wght@100&family=Roboto:wght@100;300;400;500;700;900&display=swap";*/
     let fa =
       "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css";
-    let Avenir = `${this.props.context.pageContext.site.absoluteUrl}/SiteAssets/font/style.css`;
+    let Avenir = `${this.props.context.pageContext.web.absoluteUrl}/SiteAssets/font/style.css`;
     SPComponentLoader.loadCss(bootstarp5CSS);
     /*  SPComponentLoader.loadCss(font); */
     SPComponentLoader.loadCss(fa);
@@ -350,7 +350,7 @@ export default class GalleryPage extends React.Component<
                   style={{ fontFamily: "Avenir Next" }}
                 >
                   <h4 className="d-flex align-items-center justify-content-start ps-4 w-50">
-                    <a href={`${this.props.context.pageContext.site.absoluteUrl}`}>
+                    <a href={`${this.props.context.pageContext.web.absoluteUrl}`}>
                       <img
                         src={require("../assets/arrow-left.svg")}
                         alt="folder"

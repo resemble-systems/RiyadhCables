@@ -27,6 +27,7 @@ export interface ILoanRequestFormProps {
     managerEmail: string;
   };
   toWords: any;
+  isAdmin: boolean;
 }
 interface ILoanRequestFormState {
   isSubmitting: boolean;
@@ -39,6 +40,7 @@ interface ILoanRequestFormState {
   currencyOption: any;
   newCurrency: string;
   currencySelected: string;
+  isAdmin: boolean;
 }
 interface FieldType {
   department: string;
@@ -72,10 +74,12 @@ export default class LoanRequestForm extends React.Component<
       currencySelected: "SAR",
       isError: false,
       errorMessage: "",
+      isAdmin: false,
     };
     this.formRef = React.createRef();
   }
   public componentDidMount(): void {
+    this.getAdminUsers();
     this.getCurrency();
   }
   public getCurrency() {
@@ -103,6 +107,41 @@ export default class LoanRequestForm extends React.Component<
         });
         this.setState({ currencyOption: currencyData });
       });
+  }
+
+  public async getAdminUsers() {
+    const { context } = this.props;
+
+    const handleResponse = async (response: SPHttpClientResponse) => {
+      if (!response.ok) {
+        throw new Error(`Request failed: ${response.status}`);
+      }
+      return await response.json();
+    };
+
+    const handleFetchError = (error: any) => {
+      console.error("Request error:", error);
+      return undefined;
+    };
+
+    const getData = async (apiUrl: string): Promise<any> => {
+      try {
+        const response = await context.spHttpClient.get(
+          apiUrl,
+          SPHttpClient.configurations.v1
+        );
+        return handleResponse(response);
+      } catch (error) {
+        handleFetchError(error);
+      }
+    };
+
+    const apiUrl = `${context.pageContext.web.absoluteUrl}/_api/web/lists/GetByTitle('Admin')/items?$select=Title &$filter=ApprovalStatus eq 'Approved' & Title eq '${context.pageContext.user.email}'`;
+    const adminUsers = await getData(apiUrl);
+    console.log("ADMIN ADMIN", adminUsers);
+    if (adminUsers && adminUsers?.value.length > 0)
+      this.setState({ isAdmin: true });
+    else this.setState({ isAdmin: false });
   }
 
   public async addCurrency() {
@@ -157,6 +196,7 @@ export default class LoanRequestForm extends React.Component<
       currencySelected,
       errorMessage,
       isError,
+      isAdmin,
     } = this.state;
 
     const postUser = async (values: any) => {
@@ -349,20 +389,24 @@ export default class LoanRequestForm extends React.Component<
         dropdownRender={(menu) => (
           <>
             {menu}
-            <Divider style={{ margin: "8px 0" }} />
-            <Space style={{ padding: "0 8px 4px" }}>
-              <Input
-                required
-                name="currency"
-                value={this.state.newCurrency}
-                placeholder="Please enter Currency"
-                status={this.state.newCurrency?.length < 3 ? "error" : ""}
-                onChange={handleAddCurrency}
-              />
-              <Button danger onClick={addCurrency}>
-                Add
-              </Button>
-            </Space>
+            {isAdmin && (
+              <>
+                <Divider style={{ margin: "8px 0" }} />
+                <Space style={{ padding: "0 8px 4px" }}>
+                  <Input
+                    required
+                    name="currency"
+                    value={this.state.newCurrency}
+                    placeholder="Please enter Currency"
+                    status={this.state.newCurrency?.length < 3 ? "error" : ""}
+                    onChange={handleAddCurrency}
+                  />
+                  <Button danger onClick={addCurrency}>
+                    Add
+                  </Button>
+                </Space>
+              </>
+            )}
           </>
         )}
       />

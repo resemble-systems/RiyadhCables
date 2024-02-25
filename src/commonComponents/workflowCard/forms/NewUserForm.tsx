@@ -35,6 +35,8 @@ interface INewUserFormState {
   };
   EmailCopy: string;
   VPNAccess: boolean;
+  isError: boolean;
+  errorMessage: string;
 }
 interface FieldType {
   department: string;
@@ -75,6 +77,8 @@ export default class NewUserForm extends React.Component<
       },
       EmailCopy: "",
       VPNAccess: false,
+      isError: false,
+      errorMessage: "",
     };
     this.formRef = React.createRef();
   }
@@ -96,6 +100,8 @@ export default class NewUserForm extends React.Component<
       EmployeeType,
       RequestType,
       VPNAccess,
+      isError,
+      errorMessage,
     } = this.state;
     console.log("userCreationApprovers", userCreationApprovers);
 
@@ -129,7 +135,7 @@ export default class NewUserForm extends React.Component<
       const spHttpClintOptions: ISPHttpClientOptions = {
         headers,
         body: JSON.stringify({
-          Title: EmployeeType === "External User" ? email : email + EmailSyntax,
+          Title: EmployeeType === "External User" ? VPN : email + EmailSyntax,
           LoginName: loginName,
           Date: new Date().toString(),
           Department: CreatorDepartment,
@@ -248,10 +254,95 @@ export default class NewUserForm extends React.Component<
       }
     };
 
-    const onFinish = (values: any) => {
-      this.setState({ isSubmitting: true, isNotificationOpen: true });
+    const getUserByID = async (
+      EmployeeNo: string,
+      Email: string,
+      values: {
+        InternetAccess: string;
+        VPNAccess: string;
+        EmailAddress: string;
+      }
+    ) => {
+      const { context } = this.props;
+      let alreadyRequested = false;
+      let errorType = "";
+      try {
+        const filterQuery =
+          EmployeeType === "External User"
+            ? `&$filter=Title eq '${encodeURIComponent(Email)}'`
+            : `&$filter=EmployeeNo eq ${encodeURIComponent(EmployeeNo)}`;
+
+        const apiUrl = `${context.pageContext.web.absoluteUrl}/_api/web/lists/GetByTitle('NewUser')/items?$select=Title,EmployeeNo,EmployeeType,IsEmail,IsVPN,VPN,InternetAccess${filterQuery}`;
+
+        const userResponse = await context.spHttpClient.get(
+          apiUrl,
+          SPHttpClient.configurations.v1
+        );
+        const userData = await userResponse.json();
+        console.log("USER EXISTING", userData);
+
+        if (userData.value?.length) {
+          const { IsEmail, IsVPN, InternetAccess } = userData.value[0];
+          if (this.state.EmployeeType === "External User") {
+            alreadyRequested = true;
+            errorType = "User Creation Limit Exceeded.";
+          } else {
+            const {
+              InternetAccess: userInternetAccess,
+              EmailAddress: userEmail,
+              VPNAccess: userVPNAccess,
+            } = values;
+
+            if (userInternetAccess === "Yes" && InternetAccess === "Yes") {
+              alreadyRequested = true;
+              errorType =
+                "Internet Access has already been requested by the current user";
+            } else if (userEmail === "Yes" && IsEmail === "Yes") {
+              alreadyRequested = true;
+              errorType =
+                "Email Address has already been requested by the current user";
+            } else if (userVPNAccess === "Yes" && IsVPN === "Yes") {
+              alreadyRequested = true;
+              errorType =
+                "VPN Address has already been requested by the current user";
+            }
+          }
+          return {
+            alreadyRequested,
+            errorType,
+          };
+        } else {
+          return {
+            alreadyRequested,
+            errorType,
+          };
+        }
+      } catch (error) {
+        console.error("Error in FetchUser:", error);
+        return {
+          alreadyRequested,
+          errorType,
+        };
+      }
+    };
+
+    const onFinish = async (values: any) => {
       console.log("Success:", values, EmailSyntax, EmployeeType);
-      postUser(values);
+      const existingCheck = await getUserByID(
+        values.EmployeeNo,
+        values.VPN,
+        values
+      );
+      console.log("CHECK", existingCheck);
+      if (existingCheck.alreadyRequested) {
+        this.setState({
+          isError: true,
+          errorMessage: existingCheck.errorType,
+        });
+      } else {
+        this.setState({ isSubmitting: true, isNotificationOpen: true });
+        postUser(values);
+      }
     };
 
     const onFinishFailed = (errorInfo: any) => {
@@ -693,6 +784,37 @@ export default class NewUserForm extends React.Component<
               </Form.Item>
             </Form>
           </div>
+          {isError && (
+            <div
+              className="bg-white p-2 rounded-3 shadow-lg"
+              style={{ position: "absolute", top: 0, right: 0 }}
+            >
+              <div
+                className="d-flex justify-content-end"
+                onClick={() => {
+                  this.setState({ isError: false, errorMessage: "" });
+                }}
+              >
+                <div
+                  className="text-white bg-danger rounded px-2"
+                  style={{ cursor: "pointer" }}
+                >
+                  x
+                </div>
+              </div>
+              <div
+                className="d-flex justify-content-center align-items-center gap-1"
+                style={{ height: "60px" }}
+              >
+                <img
+                  src={require("./assets/Rejected.svg")}
+                  width={"25px"}
+                  height={"25px"}
+                />
+                <div className="fs-6 fw-medium">{errorMessage}</div>
+              </div>
+            </div>
+          )}
           {isNotificationOpen && (
             <div
               className="bg-white p-2 rounded-3 shadow-lg"

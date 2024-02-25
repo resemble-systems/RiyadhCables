@@ -547,7 +547,7 @@ export default class TemplateNews extends React.Component<
                   className="d-flex align-items-center justify-content-start ps-4 w-50"
                   style={{ fontFamily: "Avenir Next" }}
                 >
-                  <a href={`${context.pageContext.site.absoluteUrl}`}>
+                  <a href={`${context.pageContext.web.absoluteUrl}`}>
                     <img
                       src={require("../assets/arrow-left.svg")}
                       alt="folder"

@@ -61,7 +61,7 @@ export default class WorkFlow extends React.Component<
       if (this.scrollRef)
         this.scrollRef.current?.scrollIntoView({ behavior: "smooth" });
     }, 1000);
-
+  
     this.getDetails();
     this.getUserDetails();
     this.getPaymentRequestInitiators();
@@ -302,6 +302,8 @@ export default class WorkFlow extends React.Component<
       });
   }
 
+  
+
   public render(): React.ReactElement<IWorkFlowProps> {
     const bootstarp5CSS =
       "https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css";
@@ -381,6 +383,7 @@ export default class WorkFlow extends React.Component<
               Title="New User Creation Request"
               marginRight={true}
               context={context}
+              isAdmin={isAdmin}
               getWorkFlow={this.getWorkFlow}
               getNewUser={this.getNewUser}
               selectedPersonDetails={selectedPersonDetails}
@@ -392,6 +395,7 @@ export default class WorkFlow extends React.Component<
               Title="New Loan Request"
               marginRight={PaymentRequestInitiators}
               context={context}
+              isAdmin={isAdmin}
               getWorkFlow={this.getWorkFlow}
               getNewUser={this.getLoanRequest}
               selectedPersonDetails={selectedPersonDetails}
@@ -404,6 +408,7 @@ export default class WorkFlow extends React.Component<
                 Title="Payment Request"
                 marginRight={false}
                 context={context}
+                isAdmin={isAdmin}
                 getWorkFlow={this.getWorkFlow}
                 getNewUser={this.getPaymentRequest}
                 selectedPersonDetails={selectedPersonDetails}
