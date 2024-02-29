@@ -340,13 +340,13 @@ export default class NewUserForm extends React.Component<
           errorMessage: existingCheck.errorType,
         });
       } else if (
-        values.EmailAddress === "No" ||
-        values.VPNAccess === "No" ||
+        values.EmailAddress === "No" &&
+        values.VPNAccess === "No" &&
         values.InternetAccess === "No"
       ) {
         this.setState({
           isError: true,
-          errorMessage: 'Must select one request type,',
+          errorMessage: "Must select one request type,",
         });
       } else {
         this.setState({ isSubmitting: true, isNotificationOpen: true });
