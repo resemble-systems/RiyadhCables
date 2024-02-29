@@ -213,7 +213,7 @@ export default class NewUserForm extends React.Component<
           console.log("User Created");
           this.setState({
             isSubmitting: false,
-            submittingText: `New User has been created and send for Business Approval`,
+            submittingText: `The request is created`,
           });
           this.formRef?.current.resetFields();
           this.setState({ EmployeeType: "" });
@@ -339,6 +339,15 @@ export default class NewUserForm extends React.Component<
           isError: true,
           errorMessage: existingCheck.errorType,
         });
+      } else if (
+        values.EmailAddress === "No" ||
+        values.VPNAccess === "No" ||
+        values.InternetAccess === "No"
+      ) {
+        this.setState({
+          isError: true,
+          errorMessage: 'Must select one request type,',
+        });
       } else {
         this.setState({ isSubmitting: true, isNotificationOpen: true });
         postUser(values);
@@ -415,6 +424,7 @@ export default class NewUserForm extends React.Component<
                   >
                     <Input
                       placeholder="Enter Your Department...."
+                      disabled
                       defaultValue={selectedPersonDetails.department}
                     />
                   </Form.Item>
@@ -493,6 +503,7 @@ export default class NewUserForm extends React.Component<
                       {
                         required: true,
                         message: "Please enter Employee No!",
+                        pattern: new RegExp(/^\d{6}$/),
                       },
                     ]}
                   >

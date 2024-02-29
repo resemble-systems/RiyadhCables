@@ -318,8 +318,7 @@ export default class LoanRequestForm extends React.Component<
           console.log("LoanRequest Created");
           this.setState({
             isSubmitting: false,
-            submittingText:
-              "Loan Request has been created and send for Business Approval",
+            submittingText: "The request is created",
           });
           this.formRef?.current.resetFields();
           self.setState({
@@ -447,6 +446,7 @@ export default class LoanRequestForm extends React.Component<
                   {
                     required: true,
                     message: "Please enter Employee ID!",
+                    pattern: new RegExp(/^\d{6}$/),
                   },
                 ]}
               >
