@@ -63,6 +63,7 @@ export default class Survey extends React.Component<
           isSmallScreen: boolean;
         }) => {
           const { isAdmin } = UserDetails;
+          console.log('ADMIN',isAdmin)
           return (
             <CommonLayout
               lg={8}

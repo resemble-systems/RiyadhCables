@@ -49,15 +49,9 @@ export default class DepartmentPage extends React.Component<
     const fa =
       "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css";
     let Avenir = `${this.props.context.pageContext.site.absoluteUrl}/SiteAssets/font/style.css`;
-    /* const Montserrat =
-    "https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&family=Open+Sans:wght@600&display=swap";
-  const Roboto =
-    "https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap"; */
     SPComponentLoader.loadCss(bootstarp5CSS);
     SPComponentLoader.loadCss(fa);
     SPComponentLoader.loadCss(Avenir);
-    /*  SPComponentLoader.loadCss(Montserrat);
-  SPComponentLoader.loadCss(Roboto); */
     const { context } = this.props;
     const { isAdmin, screenWidth } = this.state;
     const UserName = context.pageContext.user.displayName;

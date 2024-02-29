@@ -3,7 +3,6 @@ import { WebPartContext } from "@microsoft/sp-webpart-base";
 import type { MenuProps } from "antd";
 import { Dropdown, Space } from "antd";
 import { Modal } from "antd";
-import { SPHttpClient, SPHttpClientResponse } from "@microsoft/sp-http";
 import Logo from "../Logo/Logo";
 
 interface ITopbarProps {
@@ -66,116 +65,48 @@ export default class Topbar extends React.Component<
     };
   }
 
-  public componentDidMount(): void {
-    this.getEmployeeID();
-  }
-
-  public async getEmployeeID() {
+  public async componentDidMount(): Promise<void> {
+    const { context } = this.props;
     try {
-      const { context } = this.props;
-
-      const graphClient = await context.msGraphClientFactory.getClient("3");
-
-      const user = await graphClient
-        .api(`/users/${context.pageContext.user.email}`)
+      const graphClient =
+        await this.props.context.msGraphClientFactory.getClient("3");
+      const userResponse = await graphClient
+        .api("/me")
         .version("v1.0")
-        .select("employeeId,displayName,jobTitle,department")
+        .select("displayName,jobTitle,mail,mobilePhone")
         .get();
-      console.log("USER DETAILS", user);
-      this.setState({
-        userRecords: new User(
-          user.employeeId,
-          user.displayName,
-          user.jobTitle,
-          user.department
-        ),
-      });
-      const employeeID = user.employeeId?.toString();
-      if (employeeID) this.getMyData(employeeID, "Number");
-      else this.getMyData(user.displayName, "Name");
-      console.log("Employee ID:", employeeID);
+
+      const userDetails = userResponse;
+      this.setState({ userDetails });
+
+      const directReportsResponse = await graphClient
+        .api(`/users/${context.pageContext.user.email}/directReports`)
+        .version("v1.0")
+        .select("*")
+        .get();
+
+      const directReports = directReportsResponse.value;
+      console.log();
+      this.setState({ directReports });
+
+      const directManagerResponse = await graphClient
+        .api("/me/manager")
+        .version("v1.0")
+        .select("*")
+        .get();
+
+      const directManager = directManagerResponse;
+      this.setState({ directManager });
     } catch (error) {
-      console.error("Error fetching employee ID:", error);
-    }
-  }
-
-  private async fetchData(apiUrl: string): Promise<any> {
-    const { context } = this.props;
-    const res: SPHttpClientResponse = await context.spHttpClient.get(
-      apiUrl,
-      SPHttpClient.configurations.v1
-    );
-    if (!res.ok) {
-      throw new Error(`HTTP request failed with status ${res.status}`);
-    }
-    return res.json();
-  }
-
-  public async getMyData(employeeID: string, columnName: string) {
-    const { context } = this.props;
-    console.log("Employe ID", employeeID);
-    try {
-      const apiUrl = `${context.pageContext.site.absoluteUrl}/_api/web/lists/GetByTitle('OrganizationChart')/items?$top=4999&$select=* &$filter= ${columnName} eq '${employeeID}'`;
-      const listItems = await this.fetchData(apiUrl);
-      console.log("OrganizationChart listItems", listItems);
-
-      if (listItems.value?.length > 0) {
-        const myManager = listItems.value[0].ManagerNumber;
-        const myNumber = listItems.value[0].Number;
-        this.getMyManager(myManager);
-        this.getMyDirectReports(myNumber);
-        this.setState({ userDetails: listItems.value[0] });
-      }
-    } catch (error) {
-      console.error("Error in componentDidMount:", error);
-    }
-  }
-
-  public async getMyManager(Manager: string) {
-    const { context } = this.props;
-    try {
-      const apiUrl = `${context.pageContext.site.absoluteUrl}/_api/web/lists/GetByTitle('OrganizationChart')/items?$top=4999&$select=* &$filter= Number eq '${Manager}'`;
-      const listItems: any = await this.fetchData(apiUrl);
-      console.log("getMyManager listItems", listItems);
-      if (listItems.value?.length > 0) {
-        this.setState({ directManager: listItems.value[0] });
-      }
-    } catch (error) {
-      console.error("Error in componentDidMount:", error);
-    }
-  }
-
-  public async getMyDirectReports(MyNumber: string) {
-    const { context } = this.props;
-    try {
-      const apiUrl = `${context.pageContext.site.absoluteUrl}/_api/web/lists/GetByTitle('OrganizationChart')/items?$top=4999&$select=* &$filter= ManagerNumber eq '${MyNumber}'`;
-      const listItems: any = await this.fetchData(apiUrl);
-      console.log("getMyDirectReports listItems", listItems);
-      const sortedItems = listItems.value?.sort(function (
-        a: { Name: string },
-        b: { Name: string }
-      ) {
-        const nameA = a.Name.toLowerCase();
-        const nameB = b.Name.toLowerCase();
-
-        if (nameA < nameB) {
-          return -1;
-        }
-        if (nameA > nameB) {
-          return 1;
-        }
-        return 0;
-      });
-      this.setState({ directReports: sortedItems });
-    } catch (error) {
-      console.error("Error in componentDidMount:", error);
+      console.error("Error fetching data:", error);
     }
   }
 
   public render(): React.ReactElement<ITopbarProps> {
     const chevron = require("../../assets/chevron-down.svg");
     const { context } = this.props;
-    const { userDetails, directManager, userRecords } = this.state;
+    const { userDetails, userRecords, directReports, directManager } =
+      this.state;
 
     const CurrentPage = window.location.pathname;
     const ActivePage = CurrentPage.split("/SitePages");
@@ -191,23 +122,30 @@ export default class Topbar extends React.Component<
 
     console.log(HomePage, AboutPage, OrganizationPage);
 
+    const userImage = (width: string, height: string, email: string) => {
+      return (
+        <img
+          src={`${context.pageContext.web.absoluteUrl}/_layouts/15/userphoto.aspx?AccountName=${email}`}
+          width={width}
+          height={height}
+          className="rounded-circle"
+          style={{ cursor: "pointer" }}
+        />
+      );
+    };
+
     const items: MenuProps["items"] = [
       {
         label: (
-          <div className="d-flex p-2">
-            <div className="me-2">
+          <div className="d-flex p-2 gap-2">
+            <div className="">
               <div className="mb-2">
-                <img
-                  src={`${context.pageContext.web.absoluteUrl}/_layouts/15/userphoto.aspx?AccountName=${context.pageContext.user.email}`}
-                  width="100px"
-                  height="100px"
-                  className="rounded-circle"
-                />
+                {userImage("100px", "100px", context.pageContext.user.email)}
               </div>
               <div
                 className="d-flex justify-content-center align-items-center p-2 rounded text-white"
                 style={{
-                  backgroundColor: " rgb(181, 77, 38)",
+                  backgroundColor: "#f75b52",
                   fontWeight: "600",
                 }}
               >
@@ -221,19 +159,11 @@ export default class Topbar extends React.Component<
             </div>
             <div>
               <div className="fs-5" style={{ fontWeight: "600" }}>
-                {`${
-                  userRecords?.displayName
-                    ? userRecords.displayName
-                    : "Sharepoint Developer"
-                }`}
+                {`${userDetails?.displayName || "Sharepoint Developer"}`}
               </div>
-              <div className="fs-6">{`${
-                userRecords?.jobTitle ? userRecords.jobTitle : ""
-              }`}</div>
-              <div className="fs-6">{`${context.pageContext.user.email}`}</div>
-              <div className="fs-6">{`${
-                userRecords?.department ? userRecords.department : ""
-              }`}</div>
+              <div className="fs-6">{`${userDetails?.jobTitle || ""}`}</div>
+              <div className="fs-6">{`${userDetails?.mail || ""}`}</div>
+              <div className="fs-6">{`${userDetails?.mobilePhone || ""}`}</div>
             </div>
           </div>
         ),
@@ -327,13 +257,7 @@ export default class Topbar extends React.Component<
                 Organization Chart
               </div>
               <div className="d-flex align-items-center">
-                <img
-                  src={`${context.pageContext.web.absoluteUrl}/_layouts/15/userphoto.aspx?AccountName=${context.pageContext.user.email}`}
-                  width="60px"
-                  height="60px"
-                  className="rounded-circle"
-                  style={{ cursor: "pointer" }}
-                />
+                {userImage("60px", "60px", context.pageContext.user.email)}
                 <div className="d-flex justify-content-between ps-2">
                   <div>
                     <div>
@@ -356,37 +280,6 @@ export default class Topbar extends React.Component<
                 </div>
               </div>
             </div>
-            {/* <div className="d-flex justify-content-end align-items-center">
-              <img
-                src={`${context.pageContext.web.absoluteUrl}/_layouts/15/userphoto.aspx?AccountName=${context.pageContext.user.email}`}
-                width="60px"
-                height="60px"
-                className="rounded-circle"
-                style={{ cursor: "pointer" }}
-              />
-              <div className="d-flex justify-content-between ps-2">
-                <div>
-                  <div>
-                    <small>Welcome</small>
-                  </div>
-                  <div className="fw-bold">
-                    {context.pageContext.user.displayName}
-                  </div>
-                </div>
-                <div
-                  className="ps-2 d-flex align-items-center"
-                  style={{ cursor: "pointer" }}
-                >
-                  <Dropdown menu={{ items }} placement="bottomRight">
-                    <a onClick={(e) => e.preventDefault()}>
-                      <Space>
-                        <img src={chevron} />
-                      </Space>
-                    </a>
-                  </Dropdown>
-                </div>
-              </div>
-            </div> */}
           </div>
         </div>
         <Modal
@@ -404,46 +297,43 @@ export default class Topbar extends React.Component<
               height: "80vh",
               overflowY: "scroll",
               scrollbarWidth: "thin",
-              fontFamily: "Avenir Next",
             }}
           >
-            {Object.keys(directManager)?.length > 0 && (
+            {Object.keys(directManager)?.length && (
               <>
                 <div className="d-flex justify-content-center">
                   <div
                     className="d-flex p-2 border border-info"
                     style={{ width: "max-content" }}
                   >
-                    <div className="me-2">
-                      <div className="">
-                        <img
-                          src={`${context.pageContext.web.absoluteUrl}/_layouts/15/userphoto.aspx?AccountName=${directManager?.Email}`}
-                          width="100px"
-                          height="100px"
-                          className="rounded-circle"
-                        />
+                    {directManager?.userPrincipalName && (
+                      <div className="me-2">
+                        <div className="mb-2">
+                          {userImage(
+                            "100px",
+                            "100px",
+                            directManager?.userPrincipalName
+                          )}
+                        </div>
                       </div>
-                    </div>
+                    )}
                     <div>
-                      <div className="fs-6" style={{ fontWeight: "600" }}>
-                        {`${directManager?.Name && directManager.Name}`}
+                      <div className="fs-5" style={{ fontWeight: "600" }}>
+                        {`${directManager?.displayName}`}
                       </div>
-                      <div className="">{`${
-                        directManager?.Job_x0020_Title
-                          ? directManager.Job_x0020_Title
-                          : ""
+                      <div className="fs-6">{`${
+                        directManager?.jobTitle || ""
                       }`}</div>
-                      <div className="">{`${
-                        directManager?.Email ? directManager.Email : ""
+                      <div className="fs-6">{`${
+                        directManager?.mail || ""
                       }`}</div>
-                      <div className="">{`${
-                        directManager?.Department
-                          ? directManager.Department
-                          : ""
+                      <div className="fs-6">{`${
+                        directManager?.mobilePhone || ""
                       }`}</div>
                     </div>
                   </div>
                 </div>
+
                 <div className="d-flex justify-content-center ">
                   <div
                     className="bg-dark"
@@ -452,40 +342,33 @@ export default class Topbar extends React.Component<
                 </div>
               </>
             )}
-
             <div className="d-flex justify-content-center">
               <div
                 className="d-flex p-2 border border-info"
                 style={{ width: "max-content" }}
               >
                 <div className="me-2">
-                  <div className="">
-                    <img
-                      src={`${context.pageContext.web.absoluteUrl}/_layouts/15/userphoto.aspx?AccountName=${context.pageContext.user.email}`}
-                      width="100px"
-                      height="100px"
-                      className="rounded-circle"
-                    />
+                  <div className="mb-2">
+                    {userImage(
+                      "100px",
+                      "100px",
+                      context.pageContext.user.email
+                    )}
                   </div>
                 </div>
                 <div>
-                  <div className="fs-6" style={{ fontWeight: "600" }}>
+                  <div className="fs-5" style={{ fontWeight: "600" }}>
                     {`${
-                      userDetails?.Name
-                        ? userDetails.Name
-                        : "Sharepoint Developer"
+                      userDetails?.displayName ||
+                      context.pageContext.user.displayName
                     }`}
                   </div>
-                  <div className="">{`${
-                    userDetails?.Job_x0020_Title
-                      ? userDetails.Job_x0020_Title
-                      : ""
+                  <div className="fs-6">{`${userDetails?.jobTitle || ""}`}</div>
+                  <div className="fs-6">{`${
+                    userDetails?.mail || context.pageContext.user.email
                   }`}</div>
-                  <div className="">{`${
-                    userDetails?.Email ? userDetails.Email : ""
-                  }`}</div>
-                  <div className="">{`${
-                    userDetails?.Department ? userDetails.Department : ""
+                  <div className="fs-6">{`${
+                    userDetails?.mobilePhone || ""
                   }`}</div>
                 </div>
               </div>
@@ -498,71 +381,14 @@ export default class Topbar extends React.Component<
             </div>
             <hr className="mt-0"></hr>
             <div className="d-flex justify-content-center gap-3 flex-wrap">
-              {/* {[0, 0, 0, 0, 0, 0, 0, 0, 0, 0].map(() => (
-                <div
-                  className="d-flex p-2 border border-info bg-light"
-                  style={{ width: "max-content", height: "max-content" }}
-                >
-                  <div className="me-2">
-                    <div className="mb-2">
-                      <img
-                        src={userImg}
-                        width="60px"
-                        height="60px"
-                        className="rounded-circle"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <div className="fs-5" style={{ fontWeight: "600" }}>
-                      Hari Ajith
-                    </div>
-                    <div className="fs-6">Associate Software Developer</div>
-                  </div>
-                </div>
-              ))} */}
-              {this.state.directReports?.length > 0 ? (
-                this.state.directReports.map((orgData: any, i: any) => (
+              {directReports?.length > 0 &&
+                directReports.map((orgData: any, i: any) => (
                   <div
                     className="d-flex p-2 border border-info bg-light"
                     style={{ width: "max-content", height: "max-content" }}
                   >
-                    <div className="me-2">
-                      <div className="">
-                        <img
-                          src={`${context.pageContext.web.absoluteUrl}/_layouts/15/userphoto.aspx?AccountName=${orgData?.Email}`}
-                          width="60px"
-                          height="60px"
-                          className="rounded-circle"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <div className="fs-6" style={{ fontWeight: "600" }}>
-                        {orgData.Name}
-                      </div>
-                      <div className="">{orgData.Job_x0020_Title}</div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <></>
-              )}
-              {/* {this.state.directReports?.length > 0 ? (
-                this.state.directReports.map((orgData: any, i: any) => (
-                  <div
-                    className="d-flex p-2 border border-info bg-light"
-                    style={{ minWidth: "320px", height: "max-content" }}
-                  >
-                    <div className="me-2">
-                      <div className="mb-2">
-                        <img
-                          src={userImg}
-                          width="60px"
-                          height="60px"
-                          className="rounded-circle"
-                        />
-                      </div>
+                    <div className="mb-2 me-2">
+                      {userImage("60px", "60px", orgData?.email)}
                     </div>
                     <div>
                       <div className="fs-5" style={{ fontWeight: "600" }}>
@@ -571,51 +397,8 @@ export default class Topbar extends React.Component<
                       <div className="fs-6">{orgData.jobTitle}</div>
                     </div>
                   </div>
-                ))
-              ) : (
-                <></>
-              )} */}
+                ))}
             </div>
-
-            {/* {this.state.directReports?.length > 0 ? (
-              this.state.directReports.map((orgData: any, i: any) => (
-                  <div
-                  className="d-flex p-2 border border-info bg-light"
-                  style={{ minWidth: "320px", height: "max-content" }}
-                >
-                  <div className="me-2">
-                    <div className="mb-2">
-                      <img
-                        src={userImg}
-                        width="60px"
-                        height="60px"
-                        className="rounded-circle"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <div className="fs-5" style={{ fontWeight: "600" }}>
-                      {orgData.displayName}
-                    </div>
-                    <div className="fs-6">{orgData.jobTitle}</div>
-                  </div>
-                </div>
-
-              ))
-            ) : (
-              <Row className="w-100">
-                <Col xs={24} sm={24} md={24} lg={24} xl={24}>
-                  <div className="d-flex w-100 justify-content-center align-items-center">
-                    <Empty
-                      image={Empty.PRESENTED_IMAGE_SIMPLE}
-                      description={
-                        <span className="text-secondary">No Data</span>
-                      }
-                    ></Empty>
-                  </div>
-                </Col>
-              </Row>
-            )} */}
           </div>
         </Modal>
       </>

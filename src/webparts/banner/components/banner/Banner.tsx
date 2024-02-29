@@ -31,27 +31,12 @@ export default class Banner extends React.Component<
       departmentsAsRecent: [],
     };
   }
+  
   public componentDidMount(): void {
     const { context } = this.props;
 
     console.log("currentUrl", context.pageContext);
 
-    /*  const currentPage = context.pageContext.site.serverRequestPath.split(
-      context.pageContext.site.serverRelativeUrl
-    )[1]; */
-    /* if (
-      currentPage === "/SitePages/Page Details.aspx" ||
-      currentPage === "/SitePages/Workflow.aspx" ||
-      currentPage === "/SitePages/Announcements.aspx" ||
-      currentPage === "/SitePages/News.aspx" ||
-      currentPage === "/SitePages/Document.aspx" ||
-      currentPage === "/SitePages/Gallery.aspx" ||
-      currentPage === "/SitePages/About.aspx" ||
-      currentPage === "/SitePages/PolicesProcedures.aspx" ||
-      currentPage === "/SitePages/CompanyReports.aspx"
-    ) {
-      this.setState({ isDetailsPage: true });
-    } */
     const currentPage: string = window.location.toString().toLowerCase();
     console.log("CURRENT URL", currentPage);
     console.log(
@@ -172,9 +157,7 @@ export default class Banner extends React.Component<
                             alt="bannerImg"
                             className={`${styles.bannerImg}`}
                           />
-                         {/*  <div
-                            className={`h-100 w-100 ${styles.bannerImgLayer} `}
-                          ></div> */}
+
                           <div
                             className={`w-100 ${styles.bannerInfoContainer}`}
                           >

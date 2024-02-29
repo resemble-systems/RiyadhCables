@@ -6,7 +6,6 @@ import { SPHttpClient, SPHttpClientResponse } from "@microsoft/sp-http";
 import { Row } from "antd";
 import Announcement from "./announcement/Announcement";
 import { UserProvider } from "../../../service/UserContext";
-/* import Birthday from "./birthday/Birthday"; */
 import Application from "./application/Application";
 import DocumentStructure from "./documentsLibrary/DocumentStructure";
 import QuickPolls from "./quickPolls/QuickPolls";
@@ -73,15 +72,24 @@ export default class HomePage extends React.Component<
               items.ApprovalStatus === "Approved"
           );
         let adminList = approvedItems.map((item: any) => item.Title);
+        console.log("ADMIN LIST ITEM", adminList);
         if (adminList.length > 0) {
           let filteredAdminList = adminList.filter(
-            (item: string) => item === context.pageContext.user.loginName
+            (item: string) =>
+              item.toLowerCase() ===
+              context.pageContext.user.email.toLowerCase()
           );
           if (filteredAdminList.length === 0) {
             this.setState({ isAdmin: false });
           } else {
             this.setState({ isAdmin: true });
           }
+          console.log(
+            "ADMIN LIST ITEM",
+            adminList,
+            filteredAdminList,
+            filteredAdminList.length === 0
+          );
         } else {
           console.log("Admin Not Found");
         }
@@ -98,15 +106,9 @@ export default class HomePage extends React.Component<
       "Avenir Link",
       `${this.props.context.pageContext.site.absoluteUrl}/SiteAssets/font/styles.css`
     );
-    /* const Montserrat =
-      "https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&family=Open+Sans:wght@600&display=swap";
-    const Roboto =
-      "https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap"; */
     SPComponentLoader.loadCss(bootstarp5CSS);
     SPComponentLoader.loadCss(fa);
     SPComponentLoader.loadCss(Avenir);
-    /*  SPComponentLoader.loadCss(Montserrat);
-    SPComponentLoader.loadCss(Roboto); */
     const { context } = this.props;
     const { isAdmin, screenWidth, isLoading } = this.state;
     const UserName = context.pageContext.user.displayName;
@@ -136,7 +138,6 @@ export default class HomePage extends React.Component<
               <Application context={context} marginRight={true} />
               <News context={context} marginRight={true} />
               <Announcement context={context} marginRight={false} />
-              {/*  <Birthday context={context} marginRight={false} /> */}
               <EmployeOfMonth context={context} marginRight={false} />
               <DocumentStructure
                 context={context}

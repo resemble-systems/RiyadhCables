@@ -11,7 +11,6 @@ interface IHeaderState {
   AdminUser: any;
   canvasMargin: any;
   isLoading: boolean;
-  
 }
 
 export default class Header extends React.Component<
@@ -24,7 +23,6 @@ export default class Header extends React.Component<
       AdminUser: false,
       canvasMargin: null,
       isLoading: false,
-      
     };
   }
 
@@ -72,26 +70,18 @@ export default class Header extends React.Component<
       "f_a_50a7110f e_a_50a7110f"
     );
     canvaSection.length > 0
-      ? /* (canvaSection.style.padding = "0px") */ console.log(
-          canvaSection,
-          "canvaSection"
-        )
+      ? console.log(canvaSection, "canvaSection")
       : console.log(canvaSection, "canvaSection");
-
     const { context } = this.props;
-
     context.spHttpClient
-
       .get(
         `${context.pageContext.web.absoluteUrl}/_api/web/lists/GetByTitle('Admin')/items?$select=*&$expand=AttachmentFiles`,
         SPHttpClient.configurations.v1
       )
-
       .then((res: SPHttpClientResponse) => {
         console.log("listItems Success");
         return res.json();
       })
-
       .then((listItems: any) => {
         console.log("Admin listItems", listItems);
         const approvedItems: any = listItems.value.filter(
@@ -122,25 +112,16 @@ export default class Header extends React.Component<
     setTimeout(() => this.setState({ isLoading: false }), 2000);
   }
 
- 
-
   public render(): React.ReactElement<IHeaderProps> {
     let bootstarp5CSS =
       "https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css";
     let fa =
       "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css";
     let Avenir = `${this.props.context.pageContext.site.absoluteUrl}/SiteAssets/font/style.css`;
-
     console.log(`Props url ${this.props.context.pageContext.web.absoluteUrl}`);
-    /*  let Montserrat =
-      "https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&family=Open+Sans:wght@600&display=swap";
-    let Roboto =
-      "https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap"; */
     SPComponentLoader.loadCss(bootstarp5CSS);
     SPComponentLoader.loadCss(fa);
     SPComponentLoader.loadCss(Avenir);
-    /*  SPComponentLoader.loadCss(Montserrat);
-    SPComponentLoader.loadCss(Roboto); */
     const { context } = this.props;
     const { isLoading } = this.state;
     console.log(this.state.canvasMargin, "canvasMargin");
@@ -151,18 +132,6 @@ export default class Header extends React.Component<
           <Loader row={2} avatar={true} skeletonCount={1} />
         ) : (
           <>
-            {/* <iframe
-              src="https://tools.eurolandir.com/tools/ticker/html/?companycode=SA-RCGC&v=scrolling&lang=EN"
-              name="frame2"
-              id="frame2"
-              onLoad={() => {}}
-              allowTransparency={false}
-              style={{
-                width: "100vw",
-                height: "41px",
-                fontFamily: "Avenir Next",
-              }}
-            /> */}
             <Navbar context={context} AdminUser={this.state.AdminUser} />
           </>
         )}

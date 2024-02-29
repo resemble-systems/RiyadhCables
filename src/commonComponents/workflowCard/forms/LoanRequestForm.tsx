@@ -136,7 +136,7 @@ export default class LoanRequestForm extends React.Component<
       }
     };
 
-    const apiUrl = `${context.pageContext.web.absoluteUrl}/_api/web/lists/GetByTitle('Admin')/items?$select=Title &$filter=ApprovalStatus eq 'Approved' & Title eq '${context.pageContext.user.email}'`;
+    const apiUrl = `${context.pageContext.web.absoluteUrl}/_api/web/lists/GetByTitle('Admin')/items?$select=Title &$filter=ApprovalStatus eq 'Approved' and Title eq '${context.pageContext.user.email}'`;
     const adminUsers = await getData(apiUrl);
     console.log("ADMIN ADMIN", adminUsers);
     if (adminUsers && adminUsers?.value.length > 0)

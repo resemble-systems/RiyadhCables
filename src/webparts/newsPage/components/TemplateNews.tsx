@@ -55,48 +55,6 @@ export default class TemplateNews extends React.Component<
     this.scrollRef = React.createRef();
   }
 
-  /*  public getNews: any = () => {
-    const { context } = this.props;
-    const { modalDataID, isModalOpen, modalData } = this.state;
-    const ActivePage = window.location.pathname;
-    const CurrentPage = ActivePage.split("/SitePages");
-    const NewsPage = CurrentPage[1] === "/News.aspx" ? true : false;
-    context.spHttpClient
-      .get(
-        `${context.pageContext.web.absoluteUrl}/_api/web/lists/GetByTitle('${
-          NewsPage ? "News" : "Announcements"
-        }')/items?$select=*&$expand=AttachmentFiles`,
-        SPHttpClient.configurations.v1
-      )
-      .then((res: SPHttpClientResponse) => {
-        console.log("listItems Success");
-        return res.json();
-      })
-      .then((listItems: any) => {
-        console.log("Res listItems", listItems);
-        const approvedItems: any = listItems.value.filter(
-          (items: any) => items.ApprovalStatus === "Approved"
-        );
-        const sortedItems: any = approvedItems.sort(
-          (a: any, b: any) =>
-            new Date(b.Date).getTime() - new Date(a.Date).getTime()
-        );
-        console.log("NewsSortedItems", sortedItems);
-        let filteredModalData: any = [];
-        if (modalDataID && isModalOpen) {
-          filteredModalData = sortedItems.filter((item: any) => {
-            return modalDataID === item.ID;
-          });
-        }
-        console.log(filteredModalData, "filteredModalData");
-        console.log(modalData, "modalData Comments");
-        this.setState({
-          newsSortedAsRecent: sortedItems,
-          modalData: filteredModalData[0] ? filteredModalData[0] : {},
-        });
-      });
-  }; */
-
   public getNews = async () => {
     const { context } = this.props;
     const { modalDataID, isModalOpen } = this.state;

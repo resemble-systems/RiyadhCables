@@ -30,7 +30,15 @@ export interface IFeedBackProps {
 } */
 
 export interface IFeedBackState {
-  feedBackData: Array<any>;
+  feedBackData: Array<{
+    ID: number;
+    Title: string;
+    QuestionOne: string;
+    QuestionTwo: string;
+    QuestionThree: string;
+    Answer: string;
+    IsAnswered: boolean;
+  }>;
   modalData: Array<any>;
   currentPage: number;
   feedBackAnswers: {
@@ -109,17 +117,58 @@ export default class FeedBack extends React.Component<
             new Date(b.Created).getTime() - new Date(a.Created).getTime()
         );
 
-        const feedbackResult = sortedItems.filter((data: { Answer: string }) =>
-          data.Answer && JSON.parse(data.Answer).length
-            ? JSON.parse(data.Answer).filter(
-                (answer: { RespondantEmail: string }) =>
-                  answer.RespondantEmail?.toLowerCase() ===
+        // const feedbackResult = sortedItems.filter((data: { Answer: string }) =>
+        //   data.Answer && JSON.parse(data.Answer).length
+        //     ? JSON.parse(data.Answer).filter(
+        //         (answer: { RespondantEmail: string }) =>
+        //           answer.RespondantEmail?.toLowerCase() ===
+        //           context.pageContext.user.email?.toLowerCase()
+        //       ).length
+        //       ? null
+        //       : data
+        //     : data
+        // );
+
+        const filteredFeedback = sortedItems.map(
+          (item: {
+            ID: number;
+            Title: string;
+            QuestionOne: string;
+            QuestionTwo: string;
+            QuestionThree: string;
+            Answer: string;
+          }) => {
+            const checkIfAnswered = (answer: string) => {
+              const parsedAnswer = JSON.parse(answer || "");
+              const respondentEmails = parsedAnswer.filter(
+                (response: { RespondantEmail?: string }) =>
+                  response.RespondantEmail?.toLowerCase() ===
                   context.pageContext.user.email?.toLowerCase()
-              ).length
-              ? null
-              : data
-            : data
+              );
+              return respondentEmails.length > 0;
+            };
+
+            const {
+              ID,
+              Title,
+              QuestionOne,
+              QuestionTwo,
+              QuestionThree,
+              Answer,
+            } = item;
+
+            return {
+              ID,
+              Title,
+              QuestionOne,
+              QuestionTwo,
+              QuestionThree,
+              Answer,
+              IsAnswered: checkIfAnswered(Answer),
+            };
+          }
         );
+
         const modalAnswerData = sortedItems?.map(
           (data: {
             ID: number;
@@ -145,7 +194,7 @@ export default class FeedBack extends React.Component<
         console.log("modalAnswerData", answerFilter);
         this.setState({
           modalData: answerFilter,
-          feedBackData: feedbackResult,
+          feedBackData: filteredFeedback,
           currentModalData: answerFilter[modalCurrentPage - 1],
         });
       });
@@ -301,6 +350,7 @@ export default class FeedBack extends React.Component<
           isSmallScreen: boolean;
         }) => {
           const { isAdmin } = UserDetails;
+          console.log("ADMIN", isAdmin);
           return (
             <CommonLayout
               lg={8}
@@ -360,6 +410,7 @@ export default class FeedBack extends React.Component<
                                 value={feedBackAnswers.answerOne}
                                 name="answerOne"
                                 onChange={handleChange}
+                                disabled={data.IsAnswered}
                               />
                             </div>
                             <div>
@@ -369,6 +420,7 @@ export default class FeedBack extends React.Component<
                                   type="button"
                                   value="Yes"
                                   name="answerTwo"
+                                  disabled={data.IsAnswered}
                                   onClick={() => handleClick("Yes")}
                                   className={`border-0 py-2 px-3 rounded ${
                                     feedBackAnswers.answerTwo === "Yes"
@@ -386,6 +438,7 @@ export default class FeedBack extends React.Component<
                                   type="button"
                                   value="No"
                                   name="answerTwo"
+                                  disabled={data.IsAnswered}
                                   onClick={() => handleClick("No")}
                                   className={`border-0 py-2 px-3 rounded ${
                                     feedBackAnswers.answerTwo === "No"
@@ -409,6 +462,7 @@ export default class FeedBack extends React.Component<
                                 showCount
                                 value={feedBackAnswers.answerThree}
                                 name="answerThree"
+                                disabled={data.IsAnswered}
                                 onChange={handleChange}
                                 maxLength={50}
                               />
@@ -419,7 +473,11 @@ export default class FeedBack extends React.Component<
                                   border: "none",
                                   backgroundColor: " rgb(181, 77, 38)",
                                   fontSize: "16px",
+                                  cursor: data.IsAnswered
+                                    ? "not-allowed"
+                                    : "pointer",
                                 }}
+                                disabled={data.IsAnswered}
                                 className="text-white py-2 px-3 rounded"
                                 onClick={() =>
                                   handleSubmit(data.ID, data.Answer)

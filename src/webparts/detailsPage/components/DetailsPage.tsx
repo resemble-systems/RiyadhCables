@@ -174,16 +174,9 @@ export default class DetailsPage extends React.Component<
     switch (pageInitdetails.lname) {
       case "announcement":
         listname = "Announcements";
-        // this.setState({
-        //   links: `${context.pageContext.web.absoluteUrl}/_api/web/lists/GetByTitle('Announcements')/items('${ID}')`,
-        // });
         break;
-
       case "news":
         listname = "News";
-        // this.setState({
-        //   links: `${context.pageContext.web.absoluteUrl}/_api/web/lists/GetByTitle('News')/items('${ID}')`,
-        // });
         break;
     }
     console.log("Data captured");
@@ -257,13 +250,10 @@ export default class DetailsPage extends React.Component<
   };
   public updateLikes = (likeResponse: any, ID: any) => {
     const { context } = this.props;
-
     const headers: any = {
       "X-HTTP-Method": "MERGE",
-
       "If-Match": "*",
     };
-
     const spHttpClintOptions: ISPHttpClientOptions = {
       headers,
 
@@ -272,46 +262,22 @@ export default class DetailsPage extends React.Component<
       }),
     };
     let pageInitdetails: any = {};
-    let initDetails: any = window.location.search
-      .substring(1)
-      .split("&")
-      .map(
-        (item) => (pageInitdetails[item.split("=")[0]] = item.split("=")[1])
-      );
-    console.log(
-      initDetails,
-      "<=================>",
-      pageInitdetails,
-      "pagesssssinitDetails.lname",
-      pageInitdetails.lname
-    );
     let listname: any = "";
     console.log("pageInit.pid", pageInitdetails.pid);
     switch (pageInitdetails.lname) {
       case "announcement":
         listname = "Announcements";
-        // this.setState({
-        //   links: `${context.pageContext.web.absoluteUrl}/_api/web/lists/GetByTitle('Announcements')/items('${ID}')`,
-        // });
         break;
-
       case "news":
         listname = "News";
-        // this.setState({
-        //   links: `${context.pageContext.web.absoluteUrl}/_api/web/lists/GetByTitle('News')/items('${ID}')`,
-        // });
         break;
     }
     context.spHttpClient
-
       .post(
         `${context.pageContext.web.absoluteUrl}/_api/web/lists/GetByTitle('${listname}')/items('${ID}')`,
-
         SPHttpClient.configurations.v1,
-
         spHttpClintOptions
       )
-
       .then((r) => {
         console.log(r, "Like Response");
 
@@ -320,19 +286,13 @@ export default class DetailsPage extends React.Component<
   };
   public handleLiked = (ID: any, LIKES: any) => {
     const { context } = this.props;
-
     let result = {
       RespondantName: context.pageContext.user.displayName,
-
       RespondantEmail: context.pageContext.user.email,
     };
-
     let likesArray = JSON.parse(LIKES);
-
     console.log(likesArray, "TEST");
-
     let isUserExist: any = [];
-
     if (likesArray) {
       isUserExist = likesArray.filter(
         (item: any) =>
@@ -340,26 +300,14 @@ export default class DetailsPage extends React.Component<
           item.RespondantEmail === context.pageContext.user.email
       );
     }
-
     console.log(isUserExist, "isUserExist");
 
     if (!likesArray) {
-      console.log(
-        "!likesArray || likesArray.length===0",
-
-        !likesArray
-
-        /* likesArray.length === 0 */
-      );
-
+      console.log("!likesArray || likesArray.length===0", !likesArray);
       let likesResult = [result];
-
       let likesResponse = JSON.stringify(likesResult);
-
       console.log("likesResult", likesResult);
-
       console.log("likesResponse", likesResponse);
-
       this.updateLikes(likesResponse, ID);
     }
 
@@ -393,11 +341,8 @@ export default class DetailsPage extends React.Component<
   };
   public likeImage: any = (likeData: any) => {
     const { context } = this.props;
-
     let likesArray = JSON.parse(likeData);
-
     let isUserExist: any = [];
-
     if (likesArray) {
       isUserExist = likesArray.filter(
         (item: any) =>
@@ -405,9 +350,7 @@ export default class DetailsPage extends React.Component<
           item.RespondantEmail === context.pageContext.user.email
       );
     }
-
     console.log(isUserExist, "Liked User");
-
     if (isUserExist.length > 0) {
       return true;
     } else {
@@ -416,7 +359,6 @@ export default class DetailsPage extends React.Component<
   };
   public commentsCount: any = (commentsData: any) => {
     console.log(commentsData, "commentsData", JSON.parse(commentsData));
-
     if (!JSON.parse(commentsData) || JSON.parse(commentsData)?.length === 0)
       return 0;
     else return JSON.parse(commentsData).length;
@@ -453,10 +395,7 @@ export default class DetailsPage extends React.Component<
     const heart = require("../assets/heart.png");
     const heartOutline = require("../assets/heartsOutline.png");
     return (
-      <div
-        className="detailsContainer px-0"
-        /* style={{ paddingTop: `${isScreenWidth < 768 ? "30px" : "80px"}` }} */
-      >
+      <div className="detailsContainer px-0">
         <Row ref={this.scrollRef}>
           <Col xs={24} sm={24} md={24} lg={24}>
             <div
