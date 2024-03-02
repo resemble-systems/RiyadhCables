@@ -117,18 +117,18 @@ export default class FeedBack extends React.Component<
             new Date(b.Created).getTime() - new Date(a.Created).getTime()
         );
 
-        // const feedbackResult = sortedItems.filter((data: { Answer: string }) =>
-        //   data.Answer && JSON.parse(data.Answer).length
-        //     ? JSON.parse(data.Answer).filter(
-        //         (answer: { RespondantEmail: string }) =>
-        //           answer.RespondantEmail?.toLowerCase() ===
-        //           context.pageContext.user.email?.toLowerCase()
-        //       ).length
-        //       ? null
-        //       : data
-        //     : data
-        // );
-
+        const feedbackResult = sortedItems.filter((data: { Answer: string }) =>
+          data.Answer && JSON.parse(data.Answer).length
+            ? JSON.parse(data.Answer).filter(
+                (answer: { RespondantEmail: string }) =>
+                  answer.RespondantEmail?.toLowerCase() ===
+                  context.pageContext.user.email?.toLowerCase()
+              ).length
+              ? null
+              : data
+            : data
+        );
+        console.log("feedbackData", feedbackResult);
         const filteredFeedback = sortedItems.map(
           (item: {
             ID: number;
