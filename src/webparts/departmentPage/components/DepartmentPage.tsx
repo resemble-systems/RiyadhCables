@@ -1,7 +1,7 @@
 import * as React from "react";
 import { SPComponentLoader } from "@microsoft/sp-loader";
 import "antd/dist/reset.css";
-import "./style.css";
+// import "./style.css";
 import { Col, Row } from "antd";
 import { IDepartmentPageProps } from "./IDepartmentPageProps";
 import { UserProvider } from "../../../service/UserContext";

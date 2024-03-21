@@ -49,28 +49,28 @@ export default class Files extends React.Component<IFilesProps, IFilesState> {
               driveData.Name.split(".")[driveData.Name.split(".").length - 1]
             ) {
               case "docx" || "doc":
-                fileIcon = require("./word.png");
+                fileIcon = require("./assets/word.png");
                 break;
               case "xlsx":
-                fileIcon = require("./xlsx.png");
+                fileIcon = require("./assets/xlsx.png");
                 break;
               case "pptx" || "ppt":
-                fileIcon = require("./ppt.png");
+                fileIcon = require("./assets/ppt.png");
                 break;
               case "png":
-                fileIcon = require("./png.png");
+                fileIcon = require("./assets/png.png");
                 break;
               case "PNG":
-                fileIcon = require("./png.png");
+                fileIcon = require("./assets/png.png");
                 break;
               case "jpg" || "jpeg":
-                fileIcon = require("./jpeg.png");
+                fileIcon = require("./assets/jpeg.png");
                 break;
               case "pdf":
-                fileIcon = require("./pdf.png");
+                fileIcon = require("./assets/pdf.png");
                 break;
               default:
-                fileIcon = require("./word.png");
+                fileIcon = require("./assets/word.png");
                 break;
             }
 

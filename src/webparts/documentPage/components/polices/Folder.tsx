@@ -114,8 +114,8 @@ export default class Folder extends React.Component<
       approvedFiles,
       listName,
     } = this.props;
-    const folderIcon = require("./folder.png");
-    const up = require("./up.png");
+    const folderIcon = require("./assets/folder.png");
+    const up = require("./assets/up.png");
 
     return (
       <>

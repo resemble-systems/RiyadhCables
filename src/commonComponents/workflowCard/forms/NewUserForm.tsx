@@ -261,11 +261,13 @@ export default class NewUserForm extends React.Component<
         InternetAccess: string;
         VPNAccess: string;
         EmailAddress: string;
-      }
+      },
+      emailid: string
     ) => {
       const { context } = this.props;
       let alreadyRequested = false;
       let errorType = "";
+
       try {
         const filterQuery =
           EmployeeType === "External User"
@@ -273,14 +275,44 @@ export default class NewUserForm extends React.Component<
             : `&$filter=EmployeeNo eq ${encodeURIComponent(EmployeeNo)}`;
 
         const apiUrl = `${context.pageContext.web.absoluteUrl}/_api/web/lists/GetByTitle('NewUser')/items?$select=Title,EmployeeNo,EmployeeType,IsEmail,IsVPN,VPN,InternetAccess${filterQuery}`;
-
+        const graphClient =
+          await this.props.context.msGraphClientFactory.getClient("3");
+        const userDetails = await graphClient
+          .api("/users")
+          .version("v1.0")
+          .select("displayName,jobTitle,mail,mobilePhone,employeeId")
+          .filter("startswith(userPrincipalName, '" + emailid + "')")
+          .get();
+        console.log("userDetails", userDetails);
+        const userEmpID = await graphClient
+          .api("/users")
+          .version("v1.0")
+          .select("displayName,jobTitle,mail,mobilePhone,employeeId")
+          .filter("startswith(employeeId, '" + EmployeeNo + "')")
+          .get();
+        console.log("userEmpDetails", userEmpID);
+        if (userEmpID.value?.length > 0) {
+          if (userEmpID.value?.mail == emailid) {
+            alreadyRequested = true;
+            errorType =
+              "User Email already exist in Active Directory for this Employee Number!";
+          }
+        }
+        if (userDetails.value?.length > 0) {
+          alreadyRequested = true;
+          errorType = "User Email already exist in Active Directory!";
+        }
         const userResponse = await context.spHttpClient.get(
           apiUrl,
           SPHttpClient.configurations.v1
         );
         const userData = await userResponse.json();
         console.log("USER EXISTING", userData);
-
+        if (Email.indexOf("@riyadh-cables.com")) {
+          alreadyRequested = true;
+          errorType =
+            "VPN Address cannot contain @riyadh-cables.com domain. Kindly use an external email address";
+        }
         if (userData.value?.length) {
           const { IsEmail, IsVPN, InternetAccess } = userData.value[0];
           if (this.state.EmployeeType === "External User") {
@@ -301,6 +333,10 @@ export default class NewUserForm extends React.Component<
               alreadyRequested = true;
               errorType =
                 "Email Address has already been requested by the current user";
+            } else if (Email.indexOf("@riyadh-cables.com") && IsVPN === "Yes") {
+              alreadyRequested = true;
+              errorType =
+                "VPN Address cannot contain @riyadh-cables.com domain. Kindly use an external email address";
             } else if (userVPNAccess === "Yes" && IsVPN === "Yes") {
               alreadyRequested = true;
               errorType =
@@ -331,7 +367,8 @@ export default class NewUserForm extends React.Component<
       const existingCheck = await getUserByID(
         values.EmployeeNo,
         values.VPN,
-        values
+        values,
+        values.email
       );
       console.log("CHECK", existingCheck);
       if (existingCheck.alreadyRequested) {

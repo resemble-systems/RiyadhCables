@@ -128,7 +128,7 @@ export default class FeedBack extends React.Component<
               : data
             : data
         );
-        console.log("feedbackData", feedbackResult);
+        console.log("feedbackData", feedbackResult, sortedItems);
         const filteredFeedback = sortedItems.map(
           (item: {
             ID: number;
@@ -145,6 +145,35 @@ export default class FeedBack extends React.Component<
                   response.RespondantEmail?.toLowerCase() ===
                   context.pageContext.user.email?.toLowerCase()
               );
+              const responseVal = parsedAnswer.map(
+                (response: {
+                  RespondantEmail: string;
+                  RespondantName: string;
+                  RespondantAnswer: string;
+                }) => {
+                  if (
+                    response.RespondantEmail?.toLowerCase() ===
+                    context.pageContext.user.email?.toLowerCase()
+                  ) {
+                    console.log("responseAnswer", response.RespondantAnswer);
+                    const answerResult = JSON.stringify(
+                      response.RespondantAnswer
+                    );
+                    const answer1 = JSON.parse(answerResult);
+
+                    this.setState({
+                      feedBackAnswers: {
+                        answerOne: answer1.answerOne,
+                        answerTwo: answer1.answerTwo,
+                        answerThree: answer1.answerThree,
+                      },
+                    });
+                  } else {
+                    console.log("other");
+                  }
+                }
+              );
+              console.log(responseVal, "responseVal");
               return respondentEmails.length > 0;
             };
 
@@ -191,7 +220,7 @@ export default class FeedBack extends React.Component<
         const answerFilter = modalAnswerData?.filter(
           (data: { Answer: any }) => data.Answer != null || undefined
         );
-        console.log("modalAnswerData", answerFilter);
+        console.log("modalAnswerData", answerFilter, filteredFeedback);
         this.setState({
           modalData: answerFilter,
           feedBackData: filteredFeedback,

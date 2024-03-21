@@ -647,7 +647,8 @@ export default class PaymentRequestForm extends React.Component<
           (data: { Date: string | number }) =>
             new Date(data.Date).getMonth() === new Date().getMonth()
         );
-        const TotalCount = monthFilter?.length + 1;
+        console.log("monthFilter", monthFilter);
+        const TotalCount = monthFilter?.length;
         this.mergePaymentRequest(ID, CreatorDepartment, TotalCount);
       } else {
         this.mergePaymentRequest(ID, CreatorDepartment, 1);
@@ -662,6 +663,7 @@ export default class PaymentRequestForm extends React.Component<
     CreatorDepartment: string,
     TotalCount: number
   ) {
+    console.log("TotalCount", TotalCount);
     const { context, editForm } = this.props;
     const emptyState = (refNumber: string) => {
       this.setState({

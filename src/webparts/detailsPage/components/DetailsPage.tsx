@@ -262,6 +262,20 @@ export default class DetailsPage extends React.Component<
       }),
     };
     let pageInitdetails: any = {};
+    let initDetails: any = window.location.search
+      .substring(1)
+      .split("&")
+      .map(
+        (item) => (pageInitdetails[item.split("=")[0]] = item.split("=")[1])
+      );
+    console.log(
+      initDetails,
+      "<=================>",
+      pageInitdetails,
+      "pagesssssinitDetails.lname",
+      pageInitdetails.lname
+    );
+
     let listname: any = "";
     console.log("pageInit.pid", pageInitdetails.pid);
     switch (pageInitdetails.lname) {

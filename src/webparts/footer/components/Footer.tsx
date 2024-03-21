@@ -27,13 +27,8 @@ export default class Footer extends React.Component<
     let commentSection: any = document.getElementById("CommentsWrapper");
     commentSection.style.display = "none";
     setInterval(() => {
-      let footer = document.getElementsByClassName("l_b_beed2cf1");
-      for (var i = 0; i < footer.length; i++) {
-        const footerELE = footer[i];
-        if (footerELE instanceof HTMLElement) {
-          footerELE.style.display = "none";
-        }
-      }
+      let footer = document.getElementsByTagName("footer")[1];
+      footer.style.display = "none";
     }, 1000);
 
     const { context } = this.props;
