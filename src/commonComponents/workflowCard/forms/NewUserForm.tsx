@@ -358,7 +358,7 @@ export default class NewUserForm extends React.Component<
         "&$filter=(Status eq 'Open' or Status eq 'User Created') and " +
           (EmployeeType === "External User"
             ? `(Title eq '${encodeURIComponent(Email)}')`
-            : `(EmployeeNo eq ${encodeURIComponent(EmployeeNo)})${Email?` or (Title eq '${encodeURIComponent(Email)}')`:""}${emailid?` or (Title eq '${encodeURIComponent(emailid)}')`:""}${Email?` or (VPN eq '${encodeURIComponent(Email)}')`:""}`);
+            : `(EmployeeNo eq ${encodeURIComponent(EmployeeNo)})${emailid?` or (Title eq '${encodeURIComponent(emailid + EmailSyntax)}')`:""}${Email?` or (VPN eq '${encodeURIComponent(Email)}')`:""}`);
 
         const apiUrl = `${context.pageContext.web.absoluteUrl}/_api/web/lists/GetByTitle('NewUser')/items?$select=Title,EmployeeNo,EmployeeType,IsEmail,IsVPN,VPN,InternetAccess${filterQuery}`;
             
