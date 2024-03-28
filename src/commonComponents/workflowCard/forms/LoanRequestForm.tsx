@@ -41,6 +41,8 @@ interface ILoanRequestFormState {
   newCurrency: string;
   currencySelected: string;
   isAdmin: boolean;
+  validEmployeeNo: boolean;
+  validEmployeeUserName: string;
 }
 interface FieldType {
   department: string;
@@ -75,6 +77,8 @@ export default class LoanRequestForm extends React.Component<
       isError: false,
       errorMessage: "",
       isAdmin: false,
+      validEmployeeNo: false,
+      validEmployeeUserName: "",
     };
     this.formRef = React.createRef();
   }
@@ -108,6 +112,8 @@ export default class LoanRequestForm extends React.Component<
         this.setState({ currencyOption: currencyData });
       });
   }
+
+
 
   public async getAdminUsers() {
     const { context } = this.props;
@@ -197,6 +203,7 @@ export default class LoanRequestForm extends React.Component<
       errorMessage,
       isError,
       isAdmin,
+      validEmployeeUserName
     } = this.state;
 
     const postUser = async (values: any) => {
@@ -251,10 +258,71 @@ export default class LoanRequestForm extends React.Component<
         console.log("Form Element", this.formRef);
         getLoanRequest(postData.ID, CreatorDepartment);
       } else {
-        alert("Loan Request Creation Failed.");
         console.log("Post Failed", postResponse);
+        this.setState({
+          isSubmitting:false,
+          isError: true,
+          errorMessage: "Loan Request Creation Failed.Please try again!"
+        })
       }
     };
+
+    const checkIfValidEmployeeNo = async(EmployeeNo: string) => {
+      let regex = new RegExp(/^\d{6}$/);
+      let alreadyRequested = false;
+      let errorType = "";
+      if(EmployeeNo && EmployeeNo.length != 6) {
+        this.setState({
+          validEmployeeNo: false,
+          validEmployeeUserName: "-- Invalid User --"
+        });
+      }
+      if(regex.test(EmployeeNo)){
+        try {
+          const graphClient =
+            await this.props.context.msGraphClientFactory.getClient("3");
+          const userEmpID = await graphClient
+            .api("/users")
+            .version("v1.0")
+            .select("displayName,department,jobTitle,mail,mobilePhone,employeeId")
+            .filter(`employeeId eq '${EmployeeNo}'`)
+            .get();
+          if (userEmpID.value && userEmpID.value.length > 0) {
+            if(userEmpID.value[0].department === selectedPersonDetails.department){
+              this.setState({
+                validEmployeeNo: true,
+                validEmployeeUserName: userEmpID.value[0].displayName + ` (${userEmpID.value[0].department})`
+              });
+            }
+            else{
+              alreadyRequested = true;
+              errorType =  "Employee does not belong to your Department";
+              this.setState({
+                validEmployeeNo: false,
+                validEmployeeUserName: userEmpID.value[0].displayName + ` (${userEmpID.value[0].department})`
+              });
+            }
+          }
+          else {
+            alreadyRequested = true;
+            errorType =  "Employee No is invalid";
+            this.setState({
+              validEmployeeNo: false,
+              validEmployeeUserName: "-- Invalid User --"
+            });
+          }
+        } catch (error) {
+          console.error("Error in FetchUser:", error);
+          alreadyRequested = true;
+          errorType =  "Failed to Connect to server!";
+          this.setState({
+            validEmployeeNo: false,
+            validEmployeeUserName: "-- Failed to Connect --"
+          });
+        }
+      }
+      return {alreadyRequested, errorType};
+    }
 
     const getLoanRequest = async (ID: number, CreatorDepartment: string) => {
       const { context } = this.props;
@@ -338,10 +406,20 @@ export default class LoanRequestForm extends React.Component<
       }
     };
 
-    const onFinish = (values: any) => {
-      console.log("Success Loan:", values);
-      this.setState({ isSubmitting: true, isNotificationOpen: true });
-      postUser(values);
+    const onFinish = async(values: any) => {
+      this.setState({ isSubmitting: true, isNotificationOpen: true, submittingText: "Requesting for Loan....." });
+      let EmployeeValidation = await checkIfValidEmployeeNo(values.EmployeeID); 
+      if(EmployeeValidation.alreadyRequested){
+        this.setState({
+          isSubmitting: false,
+          isNotificationOpen:false,
+          isError: true,
+          errorMessage: EmployeeValidation.errorType
+        })
+      }
+      else{
+        postUser(values);
+      }  
     };
 
     const onFinishFailed = (errorInfo: any) => {
@@ -439,19 +517,32 @@ export default class LoanRequestForm extends React.Component<
                 padding: "1rem",
               }}
             >
-              <Form.Item<FieldType>
-                label="Employee ID"
-                name="EmployeeID"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please enter Employee ID!",
-                    pattern: new RegExp(/^\d{6}$/),
-                  },
-                ]}
-              >
-                <Input placeholder="Enter Employee ID...." />
-              </Form.Item>
+              <Row gutter={[16, 0]}>
+                <Col xs={24} sm={24} md={24} lg={12} xl={12}>
+                  <Form.Item<FieldType>
+                    label="Employee ID"
+                    name="EmployeeID"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please enter Employee ID!",
+                        pattern: new RegExp(/^\d{6}$/),
+                      },
+                    ]}
+                  >
+                    <Input onChange={(event: any) => checkIfValidEmployeeNo(event.target.value)} placeholder="Enter Employee ID...." />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} sm={24} md={24} lg={12} xl={12}>
+                    <div className="pb-2">
+                      <label>Employee Name</label>
+                    </div>
+                    <Input
+                      readOnly={true}
+                      value={validEmployeeUserName}
+                    />
+                </Col>
+              </Row>
 
               <Row gutter={[16, 0]} className="mb-3">
                 <Col xs={24} sm={24} md={24} lg={12} xl={12}>

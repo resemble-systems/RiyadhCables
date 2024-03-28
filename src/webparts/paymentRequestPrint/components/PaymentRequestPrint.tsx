@@ -21,6 +21,8 @@ interface IPaymentRequestPrintState {
   Logo: any;
   pdfFile: string;
   isLoading: boolean;
+  isError: boolean;
+  errorMsg: string;
 }
 
 declare global {
@@ -126,6 +128,8 @@ export default class PaymentRequestPrint extends React.Component<
       Logo: [],
       pdfFile: "",
       isLoading: true,
+      isError: false,
+      errorMsg: ""
     };
   }
 
@@ -318,29 +322,35 @@ export default class PaymentRequestPrint extends React.Component<
   };
 
   public joinPdf = async () => {
-    console.log("window.arrayOfPdf", window.arrayOfPdf);
-    const mergedPdf = await PDFLib.PDFDocument.create();
-    for (let document of window.arrayOfPdf) {
-      document = await PDFLib.PDFDocument.load(document.bytes);
-      const copiedPages = await mergedPdf.copyPages(
-        document,
-        document.getPageIndices()
-      );
-      copiedPages.forEach((page) => mergedPdf.addPage(page));
+
+    try{
+      console.log("window.arrayOfPdf", window.arrayOfPdf);
+      const mergedPdf = await PDFLib.PDFDocument.create();
+      for (let document of window.arrayOfPdf) {
+        document = await PDFLib.PDFDocument.load(document.bytes);
+        const copiedPages = await mergedPdf.copyPages(
+          document,
+          document.getPageIndices()
+        );
+        copiedPages.forEach((page) => mergedPdf.addPage(page));
+      }
+      var pdfBytes = await mergedPdf.save();
+      console.log("window.arrayOfPdf", pdfBytes);
+      var pdfBlob = new Blob([pdfBytes], { type: "application/pdf" });
+      var pdfLink = URL.createObjectURL(pdfBlob);
+      /*  var pdfFiles = "data:application/pdf;base64," + pdfBytes; */
+      this.setState({ pdfFile: pdfLink, isLoading: false });
     }
-    var pdfBytes = await mergedPdf.save();
-    console.log("window.arrayOfPdf", pdfBytes);
-    var pdfBlob = new Blob([pdfBytes], { type: "application/pdf" });
-    var pdfLink = URL.createObjectURL(pdfBlob);
-    /*  var pdfFiles = "data:application/pdf;base64," + pdfBytes; */
-    this.setState({ pdfFile: pdfLink, isLoading: false });
+    catch(err){
+      this.setState({isError: true, errorMsg: JSON.stringify(err)})
+    }
   };
 
   public getLogo() {
     const { context } = this.props;
     context.spHttpClient
       .get(
-        `${context.pageContext.web.absoluteUrl}/_api/web/lists/GetByTitle('Logo')/items?$select=*&$expand=AttachmentFiles`,
+        `${context.pageContext.site.absoluteUrl}/_api/web/lists/GetByTitle('Logo')/items?$select=*&$expand=AttachmentFiles`,
         SPHttpClient.configurations.v1
       )
       .then((res: SPHttpClientResponse) => {
@@ -1159,11 +1169,11 @@ export default class PaymentRequestPrint extends React.Component<
     SPComponentLoader.loadCss(fa);
     SPComponentLoader.loadCss(Avenir);
 
-    const { pdfFile, isLoading } = this.state;
+    const { pdfFile, isLoading, isError, errorMsg } = this.state;
 
     return (
       <div>
-        {isLoading ? (
+        {isLoading && !isError ? (
           <Loading loadingText={"Please wait for the file to be merged"} />
         ) : (
           <div
@@ -1173,6 +1183,7 @@ export default class PaymentRequestPrint extends React.Component<
             <iframe src={pdfFile} width={"100%"} height={700}></iframe>
           </div>
         )}
+        {isError? <div>{errorMsg}</div>:""}
       </div>
     );
   }

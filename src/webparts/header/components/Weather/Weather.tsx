@@ -24,9 +24,14 @@ export default class Weather extends React.Component<
   }
 
   componentDidMount = () => {
+    this.setState({
+      weatherImage: require("./weather.png")
+    });
+    
     navigator.geolocation.getCurrentPosition((position) => {
       let lat = position.coords.latitude;
       let long = position.coords.longitude;
+
       fetch(
         `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${long}&appid=aaa2cbfe889773ba4e86bb1e4d8597cf`
       )
@@ -161,7 +166,7 @@ export default class Weather extends React.Component<
                 fontSize: "45px",
               }}
             >
-              {weatherValue}&deg;
+              {weatherValue? weatherValue:"--"}&deg;
             </div>
           </div>
           <div className="d-flex justify-content-between ps-2" style={{}}>

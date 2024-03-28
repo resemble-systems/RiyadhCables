@@ -34,7 +34,7 @@ export default class Footer extends React.Component<
     const { context } = this.props;
     context.spHttpClient
       .get(
-        `${context.pageContext.web.absoluteUrl}/_api/web/lists/GetByTitle('Logo')/items?$select=*&$expand=AttachmentFiles`,
+        `${context.pageContext.site.absoluteUrl}/_api/web/lists/GetByTitle('Logo')/items?$select=*&$expand=AttachmentFiles`,
         SPHttpClient.configurations.v1
       )
       .then((res: SPHttpClientResponse) => {

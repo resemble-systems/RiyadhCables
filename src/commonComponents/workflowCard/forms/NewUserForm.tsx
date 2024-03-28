@@ -37,6 +37,8 @@ interface INewUserFormState {
   VPNAccess: boolean;
   isError: boolean;
   errorMessage: string;
+  validEmployeeNo: boolean;
+  validEmployeeUserName: string;
 }
 interface FieldType {
   department: string;
@@ -79,6 +81,8 @@ export default class NewUserForm extends React.Component<
       VPNAccess: false,
       isError: false,
       errorMessage: "",
+      validEmployeeNo: false,
+      validEmployeeUserName: ""
     };
     this.formRef = React.createRef();
   }
@@ -102,6 +106,7 @@ export default class NewUserForm extends React.Component<
       VPNAccess,
       isError,
       errorMessage,
+      validEmployeeUserName
     } = this.state;
     console.log("userCreationApprovers", userCreationApprovers);
 
@@ -111,6 +116,12 @@ export default class NewUserForm extends React.Component<
         this.setState({ VPNAccess: true });
       }
     };
+
+    const domainOptions = [
+      { value: "@riyadh-cables.com", label: "@riyadh-cables.com" },
+      { value: "@nci.com", label: "@nci.com" },
+      { value: "@alrowadcable.com", label: "@alrowadcable.com" },
+    ];
 
     const postUser = async (values: any) => {
       const { context } = this.props;
@@ -135,7 +146,7 @@ export default class NewUserForm extends React.Component<
       const spHttpClintOptions: ISPHttpClientOptions = {
         headers,
         body: JSON.stringify({
-          Title: EmployeeType === "External User" ? VPN : email + EmailSyntax,
+          Title: EmployeeType === "External User" ? VPN : email? email + EmailSyntax : VPN? VPN : EmployeeNo,
           LoginName: loginName,
           Date: new Date().toString(),
           Department: CreatorDepartment,
@@ -150,8 +161,8 @@ export default class NewUserForm extends React.Component<
             selectedPersonDetails.managerEmail === ""
               ? userCreationApprovers.BusinessApproverEmail
               : selectedPersonDetails.managerEmail,
-          IsEmail: EmailAddress,
-          IsVPN: VPNAccess,
+          IsEmail: EmployeeType !== "External User" ? EmailAddress : "",
+          IsVPN: VPNAccess? "Yes":"",
           CreatedBy: context.pageContext.user.displayName,
           PendingWith:
             selectedPersonDetails.manager === ""
@@ -176,7 +187,12 @@ export default class NewUserForm extends React.Component<
         const postData = await postResponse?.json();
         getNewUserRequest(postData.ID, CreatorDepartment);
       } else {
-        alert("New User Creation Failed.");
+        this.setState({
+          isSubmitting: false,
+          errorMessage: "User creation failed! Please try again.",
+          isError: true,
+          isNotificationOpen: false
+        })
         console.log("Post Failed", postResponse);
       }
     };
@@ -214,15 +230,84 @@ export default class NewUserForm extends React.Component<
           this.setState({
             isSubmitting: false,
             submittingText: `The request is created`,
+            isError: false,
+            isNotificationOpen: true,
           });
           this.formRef?.current.resetFields();
-          this.setState({ EmployeeType: "" });
+          this.setState({
+            EmployeeType: "",
+            validEmployeeUserName: "",
+            RequestType: {VPN: false, Email:false} 
+          });
         }, 1000);
       } else {
-        alert("New User Creation Failed.");
+        // alert("New User Creation Failed.");
+        this.setState({
+          isSubmitting: false,
+          errorMessage: `Unknown Error! Please refresh the page.`,
+          isError: true,
+          isNotificationOpen: false
+        });
         console.log("Post Failed", postResponse);
       }
     };
+
+    const checkIfValidEmployeeNo = async(EmployeeNo: string) => {
+      let regex = new RegExp(/^\d{6}$/);
+      let alreadyRequested = false;
+      let errorType = "";
+      if(EmployeeNo && EmployeeNo.length != 6) {
+        this.setState({
+          validEmployeeNo: false,
+          validEmployeeUserName: "-- Invalid User --"
+        });
+      }
+      if(regex.test(EmployeeNo) && EmployeeType !== "External User"){
+        try {
+          const graphClient =
+            await this.props.context.msGraphClientFactory.getClient("3");
+          const userEmpID = await graphClient
+            .api("/users")
+            .version("v1.0")
+            .select("displayName,department,jobTitle,mail,mobilePhone,employeeId")
+            .filter(`employeeId eq '${EmployeeNo}'`)
+            .get();
+          if (userEmpID.value && userEmpID.value.length > 0) {
+            if(userEmpID.value[0].department === selectedPersonDetails.department){
+              this.setState({
+                validEmployeeNo: true,
+                validEmployeeUserName: userEmpID.value[0].displayName + ` (${userEmpID.value[0].department})`
+              });
+            }
+            else{
+              alreadyRequested = true;
+              errorType =  "Employee does not belong to your Department";
+              this.setState({
+                validEmployeeNo: false,
+                validEmployeeUserName: userEmpID.value[0].displayName + ` (${userEmpID.value[0].department})`
+              });
+            }
+          }
+          else {
+            alreadyRequested = true;
+            errorType =  "Employee No is invalid";
+            this.setState({
+              validEmployeeNo: false,
+              validEmployeeUserName: "-- Invalid User --"
+            });
+          }
+        } catch (error) {
+          console.error("Error in FetchUser:", error);
+          alreadyRequested = true;
+          errorType =  "Failed to Connect to server!";
+          this.setState({
+            validEmployeeNo: false,
+            validEmployeeUserName: "-- Failed to Connect --"
+          });
+        }
+      }
+      return {alreadyRequested, errorType};
+    }
 
     const getNewUserRequest = async (ID: number, CreatorDepartment: string) => {
       const { context } = this.props;
@@ -270,91 +355,146 @@ export default class NewUserForm extends React.Component<
 
       try {
         const filterQuery =
-          EmployeeType === "External User"
-            ? `&$filter=Title eq '${encodeURIComponent(Email)}'`
-            : `&$filter=EmployeeNo eq ${encodeURIComponent(EmployeeNo)}`;
+        "&$filter=(Status eq 'Open' or Status eq 'User Created') and " +
+          (EmployeeType === "External User"
+            ? `(Title eq '${encodeURIComponent(Email)}')`
+            : `(EmployeeNo eq ${encodeURIComponent(EmployeeNo)})${Email?` or (Title eq '${encodeURIComponent(Email)}')`:""}${emailid?` or (Title eq '${encodeURIComponent(emailid)}')`:""}${Email?` or (VPN eq '${encodeURIComponent(Email)}')`:""}`);
 
         const apiUrl = `${context.pageContext.web.absoluteUrl}/_api/web/lists/GetByTitle('NewUser')/items?$select=Title,EmployeeNo,EmployeeType,IsEmail,IsVPN,VPN,InternetAccess${filterQuery}`;
-        const graphClient =
-          await this.props.context.msGraphClientFactory.getClient("3");
-        const userDetails = await graphClient
-          .api("/users")
-          .version("v1.0")
-          .select("displayName,jobTitle,mail,mobilePhone,employeeId")
-          .filter("startswith(userPrincipalName, '" + emailid + "')")
-          .get();
-        console.log("userDetails", userDetails);
-        const userEmpID = await graphClient
-          .api("/users")
-          .version("v1.0")
-          .select("displayName,jobTitle,mail,mobilePhone,employeeId")
-          .filter("startswith(employeeId, '" + EmployeeNo + "')")
-          .get();
-        console.log("userEmpDetails", userEmpID);
-        if (userEmpID.value?.length > 0) {
-          if (userEmpID.value?.mail == emailid) {
-            alreadyRequested = true;
-            errorType =
-              "User Email already exist in Active Directory for this Employee Number!";
-          }
-        }
-        if (userDetails.value?.length > 0) {
-          alreadyRequested = true;
-          errorType = "User Email already exist in Active Directory!";
-        }
-        const userResponse = await context.spHttpClient.get(
-          apiUrl,
-          SPHttpClient.configurations.v1
-        );
-        const userData = await userResponse.json();
-        console.log("USER EXISTING", userData);
-        if (Email.indexOf("@riyadh-cables.com")) {
-          alreadyRequested = true;
-          errorType =
-            "VPN Address cannot contain @riyadh-cables.com domain. Kindly use an external email address";
-        }
-        if (userData.value?.length) {
-          const { IsEmail, IsVPN, InternetAccess } = userData.value[0];
-          if (this.state.EmployeeType === "External User") {
-            alreadyRequested = true;
-            errorType = "User Creation Limit Exceeded.";
-          } else {
-            const {
-              InternetAccess: userInternetAccess,
-              EmailAddress: userEmail,
-              VPNAccess: userVPNAccess,
-            } = values;
+            
+        let EmployeeValidation = await checkIfValidEmployeeNo(EmployeeNo);
 
-            if (userInternetAccess === "Yes" && InternetAccess === "Yes") {
+        alreadyRequested = EmployeeValidation.alreadyRequested;
+        errorType = EmployeeValidation.errorType;
+
+        if(EmployeeType !== "External User" && emailid && !alreadyRequested) {
+          const graphClient =
+            await this.props.context.msGraphClientFactory.getClient("3");
+          const userDetails = await graphClient
+            .api("/users")
+            .version("v1.0")
+            .select("displayName,jobTitle,mail,mobilePhone,employeeId")
+            .filter("startswith(userPrincipalName, '" + emailid + "')")
+            .get();
+          console.log("userDetails", userDetails);
+          // const userEmpID = await graphClient
+          //   .api("/users")
+          //   .version("v1.0")
+          //   .select("displayName,jobTitle,mail,mobilePhone,employeeId")
+          //   .filter("startswith(employeeId, '" + EmployeeNo + "')")
+          //   .get();
+          // console.log("userEmpDetails", userEmpID);
+          if (userDetails.value?.length > 0) {
+            if (userDetails.value.find((user: any) => user.mail.toLowerCase() === (emailid + EmailSyntax).toLowerCase() && EmployeeNo == user.employeeId)) {
               alreadyRequested = true;
-              errorType =
-                "Internet Access has already been requested by the current user";
-            } else if (userEmail === "Yes" && IsEmail === "Yes") {
+              errorType = "Requested Email already exist in Active Directory for the same user!";
+            }
+            else if (userDetails.value.find((user: any) => user.mail.toLowerCase() === (emailid + EmailSyntax).toLowerCase())) {
               alreadyRequested = true;
-              errorType =
-                "Email Address has already been requested by the current user";
-            } else if (Email.indexOf("@riyadh-cables.com") && IsVPN === "Yes") {
-              alreadyRequested = true;
-              errorType =
-                "VPN Address cannot contain @riyadh-cables.com domain. Kindly use an external email address";
-            } else if (userVPNAccess === "Yes" && IsVPN === "Yes") {
-              alreadyRequested = true;
-              errorType =
-                "VPN Address has already been requested by the current user";
+              errorType = "User Email already exist in Active Directory for another user!";
             }
           }
-          return {
-            alreadyRequested,
-            errorType,
-          };
-        } else {
-          return {
-            alreadyRequested,
-            errorType,
-          };
+          // if (userEmpID.value?.length > 0) {
+          //   if (userEmpID.value.find((user: any) => user.mail.toLowerCase() === emailid.toLowerCase())) {
+          //     alreadyRequested = true;
+          //     errorType = "User Email already exist in Active Directory for this Employee Number!";
+          //   }
+          // }
         }
+
+        let regex = new RegExp(
+          /^([a-zA-Z0-9\._]{3,})+@riyadh-cables.com$|@nci.com$|@alrowadcable.com$/
+        )
+        
+        if (EmployeeType === "External User" && Email && regex.test(Email) && !alreadyRequested) {
+          alreadyRequested = true;
+          errorType =
+            "VPN Address cannot contain Company domains. Kindly use an external email address";
+        }
+        else if(!alreadyRequested) {
+          const userResponse = await context.spHttpClient.get(
+            apiUrl,
+            SPHttpClient.configurations.v1
+          );
+          const userData = await userResponse.json();
+          console.log("USER EXISTING", userData);
+          if (userData.value?.length) {
+
+            if (EmployeeType === "External User") {
+              alreadyRequested = true;
+              errorType = "User Creation Limit Exceeded.";
+            } else {
+              let userDataFinal = {
+                IsEmail: "No",
+                IsVPN: "No",
+                InternetAccess: "No",
+                VPNAddresstaken: "No"
+              }
+              userData.value.map((user:any) => {
+                if(user.IsEmail == "Yes" && EmployeeNo == user.EmployeeNo){
+                  userDataFinal.IsEmail = "Yes";
+                }
+                if(user.IsVPN == "Yes" && EmployeeNo == user.EmployeeNo){
+                  userDataFinal.IsVPN = "Yes";
+                }
+                if(user.InternetAccess == "Yes" && EmployeeNo == user.EmployeeNo){
+                  userDataFinal.InternetAccess = "Yes";
+                }
+                if(user.VPN == Email){
+                  userDataFinal.VPNAddresstaken = "Yes";
+                }
+              })
+              const { IsEmail, IsVPN, InternetAccess, VPNAddresstaken } = userDataFinal;
+
+              const {
+                InternetAccess: userInternetAccess,
+                EmailAddress: userEmail,
+                VPNAccess: userVPNAccess,
+              } = values;
+
+              if(userEmail == "Yes" &&  userData.value.find((request: any) => request.Title.toLowerCase() === (emailid + EmailSyntax).toLowerCase())) {
+                alreadyRequested = true;
+                errorType =
+                  "Request for this Email Address already exist.";
+              }
+
+              if (userInternetAccess === "Yes" && InternetAccess === "Yes") {
+                alreadyRequested = true;
+                errorType =
+                  "Internet Access has already been requested for this employee.";
+              } else if (userEmail === "Yes" && IsEmail === "Yes" && EmployeeType == "New Employee") {
+                alreadyRequested = true;
+                errorType =
+                  "Email Address has already been requested for this employee.";
+              } else if (userVPNAccess === "Yes" && !regex.test(Email)) {
+                alreadyRequested = true;
+                errorType =
+                  "VPN Address must be a valid local domain.";
+              } else if (userVPNAccess === "Yes" && IsVPN === "Yes") {
+                alreadyRequested = true;
+                errorType =
+                  "VPN Address has already been requested for this employee.";
+              } else if (userVPNAccess === "Yes" && VPNAddresstaken == "Yes") {
+                alreadyRequested = true;
+                errorType =
+                  "VPN Address is already requested by another employee.";
+              }
+            }
+            return {
+              alreadyRequested,
+              errorType,
+            };
+          } 
+        }
+        
+        return {
+          alreadyRequested,
+          errorType,
+        };
       } catch (error) {
         console.error("Error in FetchUser:", error);
+        alreadyRequested = true;
+        errorType = "Unknown Error!";
         return {
           alreadyRequested,
           errorType,
@@ -364,6 +504,12 @@ export default class NewUserForm extends React.Component<
 
     const onFinish = async (values: any) => {
       console.log("Success:", values, EmailSyntax, EmployeeType);
+      this.setState({
+        isSubmitting: true,
+        isNotificationOpen: true,
+        isError: false,
+        submittingText: "User is being created....."
+      })
       const existingCheck = await getUserByID(
         values.EmployeeNo,
         values.VPN,
@@ -375,6 +521,8 @@ export default class NewUserForm extends React.Component<
         this.setState({
           isError: true,
           errorMessage: existingCheck.errorType,
+          isSubmitting: false,
+          isNotificationOpen: false
         });
       } else if (
         values.EmailAddress === "No" &&
@@ -384,9 +532,16 @@ export default class NewUserForm extends React.Component<
         this.setState({
           isError: true,
           errorMessage: "Must select one request type,",
+          isNotificationOpen: false,
+          isSubmitting: false,
         });
       } else {
-        this.setState({ isSubmitting: true, isNotificationOpen: true });
+        this.setState({
+          isSubmitting: true,
+          isError: false,
+          isNotificationOpen: true,
+          submittingText: "User is being created....." 
+        });
         postUser(values);
       }
     };
@@ -394,12 +549,6 @@ export default class NewUserForm extends React.Component<
     const onFinishFailed = (errorInfo: any) => {
       console.log("Failed:", errorInfo);
     };
-
-    const currencyOption = [
-      { value: "@riyadh-cables.com", label: "@riyadh-cables.com" },
-      { value: "@nci.com", label: "@nci.com" },
-      { value: "@alrowadcable.com", label: "@alrowadcable.com" },
-    ];
 
     const selectAfter = (
       <Select
@@ -410,7 +559,7 @@ export default class NewUserForm extends React.Component<
         onChange={(newValue: string) => {
           this.setState({ EmailSyntax: newValue });
         }}
-        options={currencyOption?.map(
+        options={domainOptions?.map(
           (data: { value: string; label: string }) => ({
             value: data.value,
             label: data.label,
@@ -533,19 +682,32 @@ export default class NewUserForm extends React.Component<
               {EmployeeType === "Existing Employee" ||
               EmployeeType === "New Employee" ? (
                 <>
-                  <Form.Item<FieldType>
-                    label="Employee No"
-                    name="EmployeeNo"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please enter Employee No!",
-                        pattern: new RegExp(/^\d{6}$/),
-                      },
-                    ]}
-                  >
-                    <Input placeholder="Enter Employee No...." />
-                  </Form.Item>
+                  <Row gutter={[16, 0]}>
+                    <Col xs={24} sm={24} md={24} lg={12} xl={12}>
+                      <Form.Item<FieldType>
+                        label="Employee No"
+                        name="EmployeeNo"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please enter valid Employee No!",
+                            pattern: new RegExp(/^\d{6}$/),
+                          },
+                        ]}
+                      >
+                        <Input onChange={(event: any) => checkIfValidEmployeeNo(event.target.value)} placeholder="Enter Employee No...." />
+                      </Form.Item>
+                    </Col>
+                    <Col xs={24} sm={24} md={24} lg={12} xl={12}>
+                        <div className="pb-2">
+                          <label>Employee Name</label>
+                        </div>
+                        <Input
+                          readOnly={true}
+                          value={validEmployeeUserName}
+                        />
+                    </Col>
+                  </Row>
 
                   <Form.Item<FieldType>
                     name="RequestType"
@@ -707,20 +869,20 @@ export default class NewUserForm extends React.Component<
                           </Form.Item>
                           {VPNAccess && (
                             <Form.Item<FieldType>
-                              label="Extrenal Email Address"
+                              label="External Email Address"
                               name="VPN"
                               rules={[
                                 {
                                   required: true,
                                   message:
-                                    "Please Enter Valid Extrenal Email Address!",
+                                    "Please Enter Valid External Email Address!",
                                   pattern: new RegExp(
                                     /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
                                   ),
                                 },
                               ]}
                             >
-                              <Input placeholder="Enter Extrenal Email Address...." />
+                              <Input placeholder="Enter External Email Address...." />
                             </Form.Item>
                           )}
                         </Col>
@@ -790,7 +952,11 @@ export default class NewUserForm extends React.Component<
                         }}
                         onClick={() => {
                           this.formRef?.current.resetFields();
-                          this.setState({ EmployeeType: "" });
+                          this.setState({ 
+                            EmployeeType: "",
+                            validEmployeeUserName: "",
+                            RequestType: {VPN: false, Email:false}
+                          });
                         }}
                       >
                         Reset Form
