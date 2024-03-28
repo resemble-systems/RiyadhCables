@@ -162,7 +162,7 @@ export default class NewUserForm extends React.Component<
               ? userCreationApprovers.BusinessApproverEmail
               : selectedPersonDetails.managerEmail,
           IsEmail: EmployeeType !== "External User" ? EmailAddress : "",
-          IsVPN: VPNAccess? "Yes":"",
+          IsVPN: EmployeeType === "External User" ? "Yes": VPNAccess,
           CreatedBy: context.pageContext.user.displayName,
           PendingWith:
             selectedPersonDetails.manager === ""
