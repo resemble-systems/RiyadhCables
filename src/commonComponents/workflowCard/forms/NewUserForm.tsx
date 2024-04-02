@@ -376,7 +376,6 @@ export default class NewUserForm extends React.Component<
             .select("displayName,jobTitle,mail,mobilePhone,employeeId")
             .filter("startswith(userPrincipalName, '" + emailid + "')")
             .get();
-          console.log("userDetails", userDetails);
           // const userEmpID = await graphClient
           //   .api("/users")
           //   .version("v1.0")
@@ -400,6 +399,25 @@ export default class NewUserForm extends React.Component<
           //     errorType = "User Email already exist in Active Directory for this Employee Number!";
           //   }
           // }
+        }
+
+        console.log("EmailValue", Email, alreadyRequested);
+        if(EmployeeType !== "External User" && Email && Email.length > 0 && !alreadyRequested) {
+          const graphClient =
+          await this.props.context.msGraphClientFactory.getClient("3");
+          const userDetailsforVpn = await graphClient
+            .api("/users")
+            .version("v1.0")
+            .select("displayName,jobTitle,mail,mobilePhone,employeeId")
+            .filter("startswith(userPrincipalName, '" + Email + "')")
+            .get();
+
+          if (userDetailsforVpn.value?.length > 0) {
+            if (userDetailsforVpn.value.find((user: any) => user.mail.toLowerCase() === (Email).toLowerCase())) {
+              alreadyRequested = true;
+              errorType = "Requested VPN Email already exist in Active Directory!";
+            }
+          }
         }
 
         let regex = new RegExp(
