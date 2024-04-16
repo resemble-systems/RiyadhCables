@@ -1231,7 +1231,7 @@ export default class PaymentRequestView extends React.Component<
                   <>
                     {modalData?.map((data: DataType) => (
                       <div>
-                        {data.TreasuryApproval === "Approved" ? (
+                        {/* {data.TreasuryApproval === "Approved" ? ( */}
                           <a
                             href={`${context.pageContext.web.absoluteUrl}/SitePages/PaymentRequestPrint.aspx?paymentRequest=${data.ID}`}
                             target="_blank"
@@ -1246,9 +1246,9 @@ export default class PaymentRequestView extends React.Component<
                               <img src={Print} height={24} />
                             </div>
                           </a>
-                        ) : (
+                        {/* ) : (
                           <></>
-                        )}
+                        )} */}
                         <PaymentRequestFeilds
                           data={data}
                           context={context}

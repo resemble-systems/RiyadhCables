@@ -24,6 +24,8 @@ interface ILoanRequestFormViewState {
   reasonForRejection: string;
   isError: boolean;
   errorMessage: string;
+  validEmployeeUserName: string;
+  lastRequestedGraphId: string;
 }
 interface DataType {
   key: React.Key;
@@ -77,6 +79,8 @@ export default class LoanRequestFormView extends React.Component<
       reasonForRejection: "",
       isError: false,
       errorMessage: "",
+      validEmployeeUserName: "",
+      lastRequestedGraphId: ""
     };
   }
   public componentDidMount(): void {}
@@ -321,8 +325,52 @@ export default class LoanRequestFormView extends React.Component<
       loadingText,
     } = this.props;
 
-    const { openRejectComments, reasonForRejection, isError, errorMessage } =
+    const { openRejectComments, reasonForRejection, isError, errorMessage, validEmployeeUserName, lastRequestedGraphId } =
       this.state;
+
+    const checkIfValidEmployeeNo = async(EmployeeNo: string) => {
+      let regex = new RegExp(/^\d{6}$/);
+      if(EmployeeNo && EmployeeNo.length != 6) {
+        this.setState({
+          validEmployeeUserName: "-- Invalid User --"
+        });
+      }
+      if(regex.test(EmployeeNo) && EmployeeNo != lastRequestedGraphId){
+        try {
+          const graphClient =
+            await this.props.context.msGraphClientFactory.getClient("3");
+          const userEmpID = await graphClient
+            .api("/users")
+            .version("v1.0")
+            .select("displayName,department,jobTitle,mail,mobilePhone,employeeId")
+            .filter(`employeeId eq '${EmployeeNo}'`)
+            .get();
+          let newUserName = userEmpID.value[0].displayName + ` (${userEmpID.value[0].department})`;
+          if (userEmpID.value && userEmpID.value.length > 0 && validEmployeeUserName != newUserName) {
+            this.setState({
+              lastRequestedGraphId: EmployeeNo,
+              validEmployeeUserName: userEmpID.value[0].displayName + ` (${userEmpID.value[0].department})`
+            });
+          }
+          else if(!(userEmpID.value && userEmpID.value.length > 0)){
+            this.setState({
+              validEmployeeUserName: "-- Invalid User --"
+            });
+          }
+        } catch (error) {
+          console.error("Error in FetchUser:", error);
+          this.setState({
+            validEmployeeUserName: "-- Failed to Connect --"
+          });
+        }
+      }
+    }
+       
+    this.componentDidUpdate = () => {
+      if(modalData && modalData[0] && modalData[0].EmployeeeID){
+        checkIfValidEmployeeNo(modalData[0].EmployeeeID);
+      } 
+    }
 
     return (
       <Modal
@@ -365,11 +413,17 @@ export default class LoanRequestFormView extends React.Component<
                 ) : (
                   <>
                     {modalData?.map((data: DataType) => (
-                      <div>
+                    <div>
                         <div className="d-flex flex-column gap-3 formData">
-                          <div>
-                            <div>Employee ID</div>
-                            <input value={data.EmployeeeID} disabled />
+                          <div className="d-md-flex gap-2">
+                            <div className="flex-fill">
+                              <div>Employee ID</div>
+                              <input value={data.EmployeeeID} disabled />
+                            </div>
+                            <div className="flex-fill">
+                              <div>Employee Name & Department</div>
+                              <input value={validEmployeeUserName} disabled />
+                            </div>
                           </div>
                           <div>
                             <div>Reference Number</div>
@@ -387,11 +441,11 @@ export default class LoanRequestFormView extends React.Component<
                           </div>
                           <div className="d-md-flex gap-3">
                             <div className="flex-fill">
-                              <div>Employee Name</div>
+                              <div>Requestor Name</div>
                               <input value={data.Title} disabled />
                             </div>
                             <div className="flex-fill">
-                              <div>ID</div>
+                              <div>Requestor ID</div>
                               <input value={data.EmployeeID} disabled />
                             </div>
                           </div>
